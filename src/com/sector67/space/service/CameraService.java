@@ -5,6 +5,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.Format;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import android.app.Activity;
 import android.content.Context;
@@ -19,14 +22,17 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
 import com.sector67.space.R;
 
-public class CameraService extends Activity {
-	Camera mCamera;
-	SurfaceHolder mSurfaceHolder;
+public class CameraService extends Activity implements SurfaceHolder.Callback {
+	private Camera camera;
+    private SurfaceView surfaceView;
+	private SurfaceHolder surfaceHolder;
+	boolean isPreview;
 	
 	ShutterCallback shutterCallback = new ShutterCallback() {
 		  public void onShutter() {
@@ -42,7 +48,10 @@ public class CameraService extends Activity {
 		 
 		PictureCallback jpegCallback = new PictureCallback() {
 		  public void onPictureTaken(byte[] imageData, Camera _camera) {
-			storeByteImage(CameraService.this, imageData, 50, "ImageName");
+			Format fileNameFormatter = new SimpleDateFormat("yyyyMMdd-kk-mm-ss-SSS");
+			String fileName = fileNameFormatter.format(new Date());
+			storeByteImage(CameraService.this, imageData, 100, fileName);
+	        surfaceView.setVisibility(View.GONE);
 		  }
 		};
 
@@ -51,37 +60,33 @@ public class CameraService extends Activity {
 
 		Log.e("CameraService", "onCreate");
 
-		getWindow().setFormat(PixelFormat.TRANSLUCENT);
-		requestWindowFeature(Window.FEATURE_NO_TITLE);
-		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-				WindowManager.LayoutParams.FLAG_FULLSCREEN);
-		setContentView(R.layout.camera);
-		SurfaceView mSurfaceView = (SurfaceView) findViewById(R.id.surface_camera);
-		mSurfaceHolder = mSurfaceView.getHolder();
-		mSurfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-		
+        // Configure window
+        getWindow().setFormat(PixelFormat.TRANSLUCENT);
+        requestWindowFeature(Window.FEATURE_NO_TITLE); 
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+        WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+        // Use camera.xml as content view
+        setContentView(R.layout.camera);
+
+        // Get surface view and initialize surface holder
+        surfaceView = (SurfaceView) findViewById(R.id.surface_camera);
+        surfaceHolder = surfaceView.getHolder();
+        surfaceHolder.addCallback(this);
+        surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+        
 		//StoreByteImage(CameraService.this, imageData, 50, "ImageName");
 		//mCamera.startPreview();
     }
     
 	protected void onResume() {
 		super.onResume();
-		mCamera = Camera.open();
-		try {
-			mCamera.setPreviewDisplay(mSurfaceHolder);
-			mCamera.startPreview();
-			mCamera.takePicture(shutterCallback, rawCallback, jpegCallback);
-			mCamera.stopPreview();
-			mCamera.release();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+
 
     }
     
     public void onDestroy() {
-    	
+    	super.onDestroy();
     }
 	
 	public static boolean storeByteImage(Context mContext, byte[] imageData,
@@ -100,7 +105,7 @@ public class CameraService extends Activity {
 
 			
 			fileOutputStream = new FileOutputStream(
-					sdImageMainDirectory.toString() +"/image.jpg");
+					sdImageMainDirectory.toString() +"/" + expName + ".jpg");
 							
   
 			BufferedOutputStream bos = new BufferedOutputStream(
@@ -120,5 +125,46 @@ public class CameraService extends Activity {
 		}
 
 		return true;
+	}
+
+	@Override
+    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+        // Surface size is changed so stop preview
+        if (isPreview) {
+                camera.stopPreview();
+        }
+
+        // Set camera properties to have correct preview size
+        Camera.Parameters p = camera.getParameters();
+        camera.setDisplayOrientation(90);
+        p.setPreviewSize(height, width);
+        p.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+        p.setJpegQuality(100);
+        camera.setParameters(p);
+
+        try {
+                camera.setPreviewDisplay(holder);
+        } 
+        catch (IOException e) {
+                e.printStackTrace();
+        }
+
+        // Start preview again
+        camera.startPreview();
+        isPreview = true;
+        camera.takePicture(shutterCallback, rawCallback, jpegCallback);
+	}
+
+	@Override
+	public void surfaceCreated(SurfaceHolder holder) {
+        camera = Camera.open(); 
+	}
+
+	@Override
+	public void surfaceDestroyed(SurfaceHolder holder) {
+		camera.stopPreview();
+        isPreview = false;
+        camera.release();
+		
 	}
 }
