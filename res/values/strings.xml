@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="hello">Hello World, SpaceActivity!</string>
+    <string name="hello">Hello World, MainActivity!</string>
     <string name="launching">Launching!!!</string>
      <string name="space">SPACE?!!!</string>
-    <string name="app_name">Hello World.</string>
+    <string name="app_name">Apollo67</string>
 </resources>
