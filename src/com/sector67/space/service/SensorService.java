@@ -84,20 +84,20 @@ public class SensorService extends Service implements SensorEventListener  {
 			dataMap.put("x", Float.toString(event.values[0]));
 			dataMap.put("y", Float.toString(event.values[1]));
 			dataMap.put("z", Float.toString(event.values[2]));
-			Log.d("SensorService", "Acceleromter event detected!  X: "+ event.values[0] + " Y: " + event.values[1] + " Z:" +  event.values[2]);
+			Log.d(SensorService.class.getName(), "Acceleromter event detected!  X: "+ event.values[0] + " Y: " + event.values[1] + " Z:" +  event.values[2]);
 			mSensorManager.unregisterListener(SensorService.this, mAccelerometer);
 		} else if (type == Sensor.TYPE_TEMPERATURE) {
 			double fahrenheit = event.values[0] * (9/5) + 32;
 			sensorType = "Temperature";
 			dataMap.put("temperatire", Float.toString(event.values[0]));
-			Log.d("SensorService", "Temperature event detected! "+ event.values[0] + " degrees celcius (" + fahrenheit + " degrees farenheit");
+			Log.d(SensorService.class.getName(), "Temperature event detected! "+ event.values[0] + " degrees celcius (" + fahrenheit + " degrees farenheit");
 			mSensorManager.unregisterListener(SensorService.this, mTemperature);
 		}
 		try {
 			JSONObject dataObj = new JSONObject(dataMap);
 			dbHelper.getSensorDao().create(new SensorActivity(sensorType, new Date(), dataObj.toString()));
 		} catch (SQLException e) {
-			Log.e("SensorService", "Unable to write to database", e);
+			Log.e(SensorService.class.getName(), "Unable to write to database", e);
 		}
 	}
     

@@ -59,9 +59,9 @@ public class LocationService extends Service{
 	        			JSONObject dataObj = new JSONObject(dataMap);
 	        			dbHelper.getSensorDao().create(new SensorActivity("Location", new Date(), dataObj.toString()));
 	        		} catch (SQLException e) {
-	        			Log.e("Location Srvice", "Unable to write to database", e);
+	        			Log.e(LocationService.class.getName(), "Unable to write to database", e);
 	        		}
-	            	Log.d("LocationService", "Location found! " + location);
+	            	Log.d(LocationService.class.getName(), "Location found! " + location);
 	            	locationManager.removeUpdates(this);
 	            }
 	

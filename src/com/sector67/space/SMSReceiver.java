@@ -10,8 +10,7 @@ import android.util.Log;
 public class SMSReceiver extends BroadcastReceiver {
 
     public static final String SMS_EXTRA_NAME = "pdus";
-    public static final String SMS_TRIGGER_TEXT = "gogogadgetspace";
-    private static final String n ="SMSReciever" ; 
+    public static final String SMS_TRIGGER_TEXT = "Apollo67 Launch";
 
     public void onReceive(Context context, Intent intent ) {
 
@@ -29,7 +28,7 @@ public class SMSReceiver extends BroadcastReceiver {
                 String address = sms.getOriginatingAddress();
                 
                 if(body.equalsIgnoreCase(SMS_TRIGGER_TEXT)){
-                	Log.i(n, "SMS recieved from " + address + ", commencing launch");
+                	Log.i(SMSReceiver.class.getName(), "SMS recieved from " + address + ", commencing launch");
                     final Intent spaceIntent = new Intent(context, SpaceActivity.class);
                     spaceIntent.addFlags(Intent.FLAG_FROM_BACKGROUND); 
                     spaceIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); 

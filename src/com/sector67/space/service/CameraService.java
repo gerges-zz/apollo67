@@ -5,14 +5,17 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Method;
+import java.sql.SQLException;
 import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.json.JSONObject;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
@@ -20,7 +23,6 @@ import android.graphics.PixelFormat;
 import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
 import android.hardware.Camera.ShutterCallback;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -30,12 +32,16 @@ import android.view.Window;
 import android.view.WindowManager;
 
 import com.sector67.space.R;
+import com.sector67.space.helper.DatabaseHelper;
+import com.sector67.space.model.SensorActivity;
 
 public class CameraService extends Activity implements SurfaceHolder.Callback {
 	private Camera camera;
     private SurfaceView surfaceView;
 	private SurfaceHolder surfaceHolder;
 	boolean isPreview;
+    private final DatabaseHelper dbHelper = new DatabaseHelper(this);
+
 	
 	ShutterCallback shutterCallback = new ShutterCallback() {
 		  public void onShutter() {
@@ -48,13 +54,21 @@ public class CameraService extends Activity implements SurfaceHolder.Callback {
 			Format fileNameFormatter = new SimpleDateFormat("yyyyMMdd-kk-mm-ss-SSS");
 			String fileName = fileNameFormatter.format(new Date());
 			storeByteImage(CameraService.this, imageData, 100, fileName);
+			Map<String, String> dataMap = new HashMap<String, String>();
+			dataMap.put("fileName", fileName);
+			JSONObject dataObj = new JSONObject(dataMap);
+			try {
+				dbHelper.getSensorDao().create(new SensorActivity("Location", new Date(), dataObj.toString()));
+			} catch (SQLException e) {
+    			Log.e(CameraService.class.getName(), "Unable to write to database", e);
+			}
 	        surfaceView.setVisibility(View.GONE);
 		  }
 		};
 
     public void onCreate(Bundle icircle) {
 		super.onCreate(icircle);
-		Log.d("CameraService", "Activity created");
+		Log.d(CameraService.class.getName(), "Activity created");
 
         // Configure window
         getWindow().setFormat(PixelFormat.TRANSLUCENT);
