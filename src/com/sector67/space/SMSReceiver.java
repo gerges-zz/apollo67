@@ -18,30 +18,28 @@ public class SMSReceiver extends BroadcastReceiver {
         	sharedPreferences =  PreferenceManager.getDefaultSharedPreferences(context);
         }
         String triggerText = sharedPreferences.getString("trigger", "Apollo67 Launch");
+        boolean primer = Boolean.valueOf(sharedPreferences.getString("primer", "false"));
+        if(primer) {
+	        Bundle smsExtras = intent.getExtras();
+	        if ( null != smsExtras ) {
+	            // Get received SMS
+	            Object[] smsExtra = (Object[]) smsExtras.get( SMS_EXTRA_NAME );
 
-
-        Bundle smsExtras = intent.getExtras();
-
-        if ( null != smsExtras ) {
-            // Get received SMS
-            Object[] smsExtra = (Object[]) smsExtras.get( SMS_EXTRA_NAME );
-
-            for ( int i = 0; i < smsExtra.length; ++i ) {
-
-
-                SmsMessage sms = SmsMessage.createFromPdu((byte[])smsExtra[i]);
-                String body = sms.getMessageBody().toString();
-                String address = sms.getOriginatingAddress();
-                
-                if(body.equalsIgnoreCase(triggerText)){
-                	Log.i(SMSReceiver.class.getName(), "SMS recieved from " + address + ", commencing launch");
-                    final Intent launchIntent = new Intent(context, LaunchActivity.class);
-                    launchIntent.addFlags(Intent.FLAG_FROM_BACKGROUND); 
-                    launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); 
-                    context.startActivity(launchIntent);
-                }
-            }
-
-        }
+	            for ( int i = 0; i < smsExtra.length; ++i ) {
+	                SmsMessage sms = SmsMessage.createFromPdu((byte[])smsExtra[i]);
+	                String body = sms.getMessageBody().toString();
+	                String address = sms.getOriginatingAddress();
+	                
+	                if(body.equalsIgnoreCase(triggerText)){
+	                	Log.i(SMSReceiver.class.getName(), "SMS recieved from " + address + ", commencing launch");
+	                    final Intent launchIntent = new Intent(context, LaunchActivity.class);
+	                    launchIntent.addFlags(Intent.FLAG_FROM_BACKGROUND); 
+	                    launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); 
+	                    context.startActivity(launchIntent);
+	                }
+	            }
+	
+	        }
+	    }
     }
 }

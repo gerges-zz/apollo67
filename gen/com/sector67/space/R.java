@@ -14,11 +14,12 @@ public final class R {
         public static final int icon=0x7f020000;
     }
     public static final class id {
-        public static final int currentTrigger=0x7f060002;
-        public static final int relativeLayout1=0x7f060003;
-        public static final int savePrefs=0x7f060004;
+        public static final int currentTrigger=0x7f060003;
+        public static final int primerButton=0x7f060001;
+        public static final int relativeLayout1=0x7f060004;
+        public static final int savePrefs=0x7f060005;
         public static final int surface_camera=0x7f060000;
-        public static final int triggerText=0x7f060001;
+        public static final int triggerText=0x7f060002;
     }
     public static final class layout {
         public static final int camera=0x7f030000;
@@ -30,12 +31,13 @@ public final class R {
         public static final int launch_countdown=0x7f040000;
     }
     public static final class string {
-        public static final int app_name=0x7f050006;
-        public static final int launching=0x7f050004;
+        public static final int app_name=0x7f050007;
+        public static final int launching=0x7f050005;
         public static final int prefs=0x7f050000;
-        public static final int space=0x7f050005;
-        public static final int triggerCurrent=0x7f050003;
-        public static final int triggerCurrentLabel=0x7f050002;
-        public static final int triggerLabel=0x7f050001;
+        public static final int primerLabel=0x7f050001;
+        public static final int space=0x7f050006;
+        public static final int triggerCurrent=0x7f050004;
+        public static final int triggerCurrentLabel=0x7f050003;
+        public static final int triggerLabel=0x7f050002;
     }
 }

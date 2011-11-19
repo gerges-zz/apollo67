@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="prefs">Preferences:</string>
+    <string name="primerLabel">Prime for launch:</string>   
     <string name="triggerLabel">Launch Trigger:</string>   
     <string name="triggerCurrentLabel">Current:</string>     
     <string name="triggerCurrent">Apollo67 Launch</string>     

@@ -8,6 +8,11 @@
     android:layout_width="fill_parent" 
     android:textSize="20sp"
     android:text="@string/prefs" android:layout_height="42dp"/>
+<TextView android:layout_height="31dp" android:text="@string/primerLabel" android:layout_width="fill_parent"></TextView>
+<ToggleButton android:text="ToggleButton" 
+	android:id="@+id/primerButton" 
+	android:layout_width="wrap_content" 
+	android:layout_height="wrap_content" />
 <TextView  
 	android:layout_width="fill_parent" 
 	android:text="@string/triggerLabel" android:layout_height="31dp"/>
