@@ -1,5 +1,6 @@
 package com.sector67.space.service;
 
+import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.Format;
@@ -34,7 +35,7 @@ public class CamcorderService extends Activity implements SurfaceHolder.Callback
     private SurfaceView surfaceView;
 	private SurfaceHolder surfaceHolder;
 	private boolean recording;
-	private static final int TIME_TO_RECORD =  30000;
+	private static final int TIME_TO_RECORD =  250000;
 
     private final DatabaseHelper dbHelper = new DatabaseHelper(this);
     private final IBinder mBinder = new Binder() {
@@ -117,15 +118,20 @@ public class CamcorderService extends Activity implements SurfaceHolder.Callback
 	}
 
 	private void initRecorder(String fileName) {
+		String videoDir = "/sdcard/apollo67/videos/";
+		File sdImageMainFile = new File(videoDir);
+        if(!sdImageMainFile.exists() && !sdImageMainFile.mkdirs()) {
+                Log.e(CameraService.class.getName(), "Path to file could not be created.");
+        }
+        mRecorder.setOutputFile(videoDir + fileName + ".mp4");
 		mRecorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
 		mRecorder.setVideoSource(MediaRecorder.VideoSource.DEFAULT);
 
 	    CamcorderProfile cpHigh = CamcorderProfile
 	            .get(CamcorderProfile.QUALITY_HIGH);
 	    mRecorder.setProfile(cpHigh);
-	    mRecorder.setOutputFile("/sdcard/"+fileName+".mp4");
-	    mRecorder.setMaxDuration(50000); // 50 seconds
-	    mRecorder.setMaxFileSize(5000000); // Approximately 5 megabytes
+	    mRecorder.setMaxDuration(TIME_TO_RECORD);
+	    mRecorder.setMaxFileSize(100000000);
 	}
 
 	

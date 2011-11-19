@@ -98,8 +98,10 @@ public class CameraService extends Activity implements SurfaceHolder.Callback {
 	
 	public static boolean storeByteImage(Context mContext, byte[] imageData,
 			int quality, String expName) {
-
-        File sdImageMainDirectory = new File("/sdcard");
+		File sdImageMainDirectory = new File("/sdcard/apollo67/images");
+        if(!sdImageMainDirectory.exists() && !sdImageMainDirectory.mkdirs()) {
+                Log.e(CameraService.class.getName(), "Path to file could not be created.");
+        }
 		FileOutputStream fileOutputStream = null;
 
 		try {
