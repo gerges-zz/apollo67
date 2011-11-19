@@ -6,7 +6,30 @@
     >
 <TextView  
     android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    android:text="@string/hello"
-    />
+    android:textSize="20sp"
+    android:text="@string/prefs" android:layout_height="42dp"/>
+<TextView  
+	android:layout_width="fill_parent" 
+	android:text="@string/triggerLabel" android:layout_height="31dp"/>
+<EditText android:layout_width="match_parent" android:id="@+id/triggerText" android:layout_height="wrap_content">
+    <requestFocus></requestFocus>
+</EditText>
+<TextView  
+	android:layout_width="fill_parent" 
+	android:layout_height="wrap_content" 
+	android:text="@string/triggerCurrentLabel"
+	android:gravity="center_vertical|center_horizontal" />
+<TextView  
+   	android:id="@+id/currentTrigger"
+	android:layout_width="fill_parent" 
+	android:layout_height="wrap_content" 
+	android:gravity="center_vertical|center_horizontal" />
+<RelativeLayout android:layout_width="match_parent" android:id="@+id/relativeLayout1" android:layout_height="wrap_content">
+<Button android:text="Save!" 
+	android:layout_height="wrap_content" 
+	android:layout_width="wrap_content" 
+	android:layout_alignParentBottom="true"
+	android:layout_centerHorizontal="true"
+	android:id="@+id/savePrefs"></Button>
+</RelativeLayout>
 </LinearLayout>

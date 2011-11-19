@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="hello">Hello World, MainActivity!</string>
+    <string name="prefs">Preferences:</string>
+    <string name="triggerLabel">Launch Trigger:</string>   
+    <string name="triggerCurrentLabel">Current:</string>     
+    <string name="triggerCurrent">Apollo67 Launch</string>     
     <string name="launching">Launching!!!</string>
      <string name="space">SPACE?!!!</string>
     <string name="app_name">Apollo67</string>
