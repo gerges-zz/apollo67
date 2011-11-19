@@ -2,5 +2,6 @@
 <resources>
     <string name="hello">Hello World, SpaceActivity!</string>
     <string name="launching">Launching!!!</string>
+     <string name="space">SPACE?!!!</string>
     <string name="app_name">Hello World.</string>
 </resources>

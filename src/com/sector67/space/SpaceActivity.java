@@ -54,7 +54,14 @@ public class SpaceActivity extends Activity {
 
 	protected void onResume() {
 		super.onResume();
-		
-
     }
+	
+	public void onDestroy() {
+		super.onDestroy();
+		AlarmManager am = (AlarmManager)getSystemService(ALARM_SERVICE);
+		am.cancel(mSensorAlarmSender);
+		am.cancel(mLocationAlarmSender);
+		am.cancel(mCameraSender);
+		am.cancel(mCamcorderSender);
+	}
 }
