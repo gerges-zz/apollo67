@@ -58,7 +58,7 @@ public class CameraService extends Activity implements SurfaceHolder.Callback {
 			dataMap.put("fileName", fileName);
 			JSONObject dataObj = new JSONObject(dataMap);
 			try {
-				dbHelper.getSensorDao().create(new SensorActivity("Location", new Date(), dataObj.toString()));
+				dbHelper.getSensorDao().create(new SensorActivity("Camera", new Date(), dataObj.toString()));
 			} catch (SQLException e) {
     			Log.e(CameraService.class.getName(), "Unable to write to database", e);
 			}
