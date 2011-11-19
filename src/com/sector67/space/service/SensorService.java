@@ -1,5 +1,12 @@
 package com.sector67.space.service;
 
+import java.sql.SQLException;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.json.JSONObject;
+
 import android.app.Service;
 import android.content.Intent;
 import android.hardware.Sensor;
@@ -12,10 +19,14 @@ import android.os.Parcel;
 import android.os.RemoteException;
 import android.util.Log;
 
-public class SensorService extends Service implements SensorEventListener {
+import com.sector67.space.helper.DatabaseHelper;
+import com.sector67.space.model.SensorActivity;
+
+public class SensorService extends Service implements SensorEventListener  {
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
     private Sensor mTemperature;
+    private final DatabaseHelper dbHelper = new DatabaseHelper(this);
     
     /**
      * This is the object that receives interactions from clients.
@@ -66,15 +77,27 @@ public class SensorService extends Service implements SensorEventListener {
 	@Override
 	public void onSensorChanged(SensorEvent event) {
 		int type = event.sensor.getType();
+		Map<String, String> dataMap = new HashMap<String, String>();
+		String sensorType = "";
 		if (type == Sensor.TYPE_ACCELEROMETER) {
-        	//log.debug("Location found! " + "Acceleromter event detected!  X: "+ event.values[0] + " Y: " + event.values[1] + " Z:" +  event.values[2]);
+			sensorType = "Accelerometer";
+			dataMap.put("x", Float.toString(event.values[0]));
+			dataMap.put("y", Float.toString(event.values[1]));
+			dataMap.put("z", Float.toString(event.values[2]));
 			Log.d("SensorService", "Acceleromter event detected!  X: "+ event.values[0] + " Y: " + event.values[1] + " Z:" +  event.values[2]);
 			mSensorManager.unregisterListener(SensorService.this, mAccelerometer);
 		} else if (type == Sensor.TYPE_TEMPERATURE) {
 			double fahrenheit = event.values[0] * (9/5) + 32;
-			//log.debug("Temperature event detected! "+ event.values[0] + " degrees celcius (" + fahrenheit + " degrees farenheit");
+			sensorType = "Temperature";
+			dataMap.put("temperatire", Float.toString(event.values[0]));
 			Log.d("SensorService", "Temperature event detected! "+ event.values[0] + " degrees celcius (" + fahrenheit + " degrees farenheit");
 			mSensorManager.unregisterListener(SensorService.this, mTemperature);
+		}
+		try {
+			JSONObject dataObj = new JSONObject(dataMap);
+			dbHelper.getSensorDao().create(new SensorActivity(sensorType, new Date(), dataObj.toString()));
+		} catch (SQLException e) {
+			Log.e("SensorService", "Unable to write to database", e);
 		}
 	}
     

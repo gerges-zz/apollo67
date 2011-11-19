@@ -1,5 +1,12 @@
 package com.sector67.space.service;
 
+import java.sql.SQLException;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.json.JSONObject;
+
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -15,8 +22,13 @@ import android.os.Parcel;
 import android.os.RemoteException;
 import android.util.Log;
 
+import com.sector67.space.helper.DatabaseHelper;
+import com.sector67.space.model.SensorActivity;
+
 public class LocationService extends Service{
     private Handler mHandler = new Handler(Looper.getMainLooper());
+    private final DatabaseHelper dbHelper = new DatabaseHelper(this);
+
     
     private final IBinder mBinder = new Binder() {
         @Override
@@ -38,6 +50,17 @@ public class LocationService extends Service{
 	            public void onLocationChanged(Location location) {
 	            	// Called when a new location is found by the network location provider.
 	            	//log.debug("Location found! " + location);
+	        		try {
+	        			Map<String, String> dataMap = new HashMap<String, String>();
+	        			dataMap.put("lattitude", Double.toString(location.getLatitude()));
+	        			dataMap.put("longitude", Double.toString(location.getLongitude()));
+	        			dataMap.put("altitude", Double.toString(location.getAltitude()));
+	        			dataMap.put("accuracy", Double.toString(location.getAccuracy()));
+	        			JSONObject dataObj = new JSONObject(dataMap);
+	        			dbHelper.getSensorDao().create(new SensorActivity("Location", new Date(), dataObj.toString()));
+	        		} catch (SQLException e) {
+	        			Log.e("Location Srvice", "Unable to write to database", e);
+	        		}
 	            	Log.d("LocationService", "Location found! " + location);
 	            	locationManager.removeUpdates(this);
 	            }

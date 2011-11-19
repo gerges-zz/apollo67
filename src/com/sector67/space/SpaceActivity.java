@@ -41,9 +41,9 @@ public class SpaceActivity extends Activity {
 		//we run a tight schedule.
         long firstTime = SystemClock.elapsedRealtime();
 		AlarmManager am = (AlarmManager)getSystemService(ALARM_SERVICE);
-        //am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, 30*1000, mSensorAlarmSender);
+        am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, 30*1000, mSensorAlarmSender);
         //am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, 30*1000, mLocationAlarmSender);
-        am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, 30*1000, mCameraSender);
+        //am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, 30*1000, mCameraSender);
 
     }
 

@@ -5,12 +5,14 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
@@ -18,6 +20,7 @@ import android.graphics.PixelFormat;
 import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
 import android.hardware.Camera.ShutterCallback;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -40,12 +43,6 @@ public class CameraService extends Activity implements SurfaceHolder.Callback {
 		  }
 		};
 		 
-		PictureCallback rawCallback = new PictureCallback() {
-		  public void onPictureTaken(byte[] _data, Camera _camera) {
-		    // TODO Do something with the image RAW data.
-		  }
-		};
-		 
 		PictureCallback jpegCallback = new PictureCallback() {
 		  public void onPictureTaken(byte[] imageData, Camera _camera) {
 			Format fileNameFormatter = new SimpleDateFormat("yyyyMMdd-kk-mm-ss-SSS");
@@ -57,8 +54,7 @@ public class CameraService extends Activity implements SurfaceHolder.Callback {
 
     public void onCreate(Bundle icircle) {
 		super.onCreate(icircle);
-
-		Log.e("CameraService", "onCreate");
+		Log.d("CameraService", "Activity created");
 
         // Configure window
         getWindow().setFormat(PixelFormat.TRANSLUCENT);
@@ -74,9 +70,6 @@ public class CameraService extends Activity implements SurfaceHolder.Callback {
         surfaceHolder = surfaceView.getHolder();
         surfaceHolder.addCallback(this);
         surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-        
-		//StoreByteImage(CameraService.this, imageData, 50, "ImageName");
-		//mCamera.startPreview();
     }
     
 	protected void onResume() {
@@ -136,14 +129,14 @@ public class CameraService extends Activity implements SurfaceHolder.Callback {
 
         // Set camera properties to have correct preview size
         Camera.Parameters p = camera.getParameters();
-        camera.setDisplayOrientation(90);
-        p.setPreviewSize(height, width);
+        camera.setDisplayOrientation(CameraService.this.getWindowManager().getDefaultDisplay().getRotation());
+        p.setPreviewSize(width, height);
         p.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
         p.setJpegQuality(100);
         camera.setParameters(p);
 
         try {
-                camera.setPreviewDisplay(holder);
+               camera.setPreviewDisplay(holder);
         } 
         catch (IOException e) {
                 e.printStackTrace();
@@ -152,7 +145,7 @@ public class CameraService extends Activity implements SurfaceHolder.Callback {
         // Start preview again
         camera.startPreview();
         isPreview = true;
-        camera.takePicture(shutterCallback, rawCallback, jpegCallback);
+        camera.takePicture(shutterCallback, null, jpegCallback);
 	}
 
 	@Override
@@ -165,6 +158,6 @@ public class CameraService extends Activity implements SurfaceHolder.Callback {
 		camera.stopPreview();
         isPreview = false;
         camera.release();
-		
 	}
+
 }
