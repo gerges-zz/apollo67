@@ -16,6 +16,7 @@ import android.hardware.SensorManager;
 import android.os.Binder;
 import android.os.IBinder;
 import android.os.Parcel;
+import android.os.PowerManager;
 import android.os.RemoteException;
 import android.util.Log;
 
@@ -27,6 +28,8 @@ public class SensorService extends Service implements SensorEventListener  {
     private Sensor mAccelerometer;
     private Sensor mTemperature;
     private final DatabaseHelper dbHelper = new DatabaseHelper(this);
+    private static PowerManager.WakeLock wakeLock;
+
     
     /**
      * This is the object that receives interactions from clients.
@@ -45,6 +48,9 @@ public class SensorService extends Service implements SensorEventListener  {
     Runnable mTask = new Runnable() {
 		@Override
 		public void run() {
+		    //attempt to release wakelock.
+			if (wakeLock != null) wakeLock.release();
+			
             long endTime = System.currentTimeMillis() + 15*1000;
             
     		mSensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
@@ -54,6 +60,11 @@ public class SensorService extends Service implements SensorEventListener  {
             mSensorManager.registerListener(SensorService.this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
             mSensorManager.registerListener(SensorService.this, mTemperature, SensorManager.SENSOR_DELAY_NORMAL);
  	       
+            //aquire wakelock
+            PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
+            wakeLock = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK| PowerManager.ACQUIRE_CAUSES_WAKEUP, SensorService.class.getName());
+            wakeLock.acquire();
+            
             //"Give it a second, it's going to space"
             while (System.currentTimeMillis() < endTime) {
                 synchronized (mBinder) {
@@ -63,7 +74,11 @@ public class SensorService extends Service implements SensorEventListener  {
                     }
                 }
             }
-            
+        	//release wakelock
+            if (wakeLock != null) {
+            	wakeLock.release();
+            	wakeLock = null;
+            }
             // Done with our work...  stop the service!
             SensorService.this.stopSelf();
 		}
