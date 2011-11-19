@@ -8,6 +8,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.json.JSONObject;
 
@@ -112,6 +114,15 @@ public class CamcorderService extends Activity implements SurfaceHolder.Callback
 		} catch (IOException e) {
 			Log.e(CamcorderService.class.getName(), "Unable to start recording", e);
 		}
+        
+        Timer timer = new Timer();
+
+        timer.schedule( new TimerTask(){
+           public void run() { 
+               CamcorderService.this.finish();
+            }
+         }, TIME_TO_RECORD);
+
 	}
 
 	@Override
