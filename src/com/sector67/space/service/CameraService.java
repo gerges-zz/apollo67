@@ -27,7 +27,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
@@ -62,7 +61,7 @@ public class CameraService extends Activity implements SurfaceHolder.Callback {
 			} catch (SQLException e) {
     			Log.e(CameraService.class.getName(), "Unable to write to database", e);
 			}
-	        surfaceView.setVisibility(View.GONE);
+	        CameraService.this.finish();
 		  }
 		};
 

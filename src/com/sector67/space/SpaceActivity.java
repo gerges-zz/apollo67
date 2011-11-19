@@ -45,9 +45,9 @@ public class SpaceActivity extends Activity {
 		//we run a tight schedule.
         long firstTime = SystemClock.elapsedRealtime();
 		AlarmManager am = (AlarmManager)getSystemService(ALARM_SERVICE);
-        am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, 60*1000, mSensorAlarmSender);
+        //am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, 60*1000, mSensorAlarmSender);
         //am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, 30*1000, mLocationAlarmSender);
-        //am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, 30*1000, mCameraSender);
+        am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, 30*1000, mCameraSender);
 		//am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, 500*1000, mCamcorderSender);
 
     }
@@ -59,9 +59,9 @@ public class SpaceActivity extends Activity {
 	public void onDestroy() {
 		super.onDestroy();
 		AlarmManager am = (AlarmManager)getSystemService(ALARM_SERVICE);
-		am.cancel(mSensorAlarmSender);
+		//am.cancel(mSensorAlarmSender);
 		//am.cancel(mLocationAlarmSender);
-		//am.cancel(mCameraSender);
+		am.cancel(mCameraSender);
 		//am.cancel(mCamcorderSender);
 	}
 }
