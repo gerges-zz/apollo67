@@ -7,6 +7,7 @@
     <string name="triggerCurrent">Apollo67 Launch</string>     
     <string name="launching">Launching!!!</string>
      <string name="space">OMG SPACE?!!!</string>
+     <string name="falling">Faaaaaling</string>
      <string name="recovery">Recovery!</string>
     <string name="app_name">Apollo67</string>
 </resources>

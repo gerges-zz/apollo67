@@ -6,7 +6,7 @@
     >
     <RelativeLayout android:layout_height="wrap_content" android:id="@+id/relativeLayout1" android:layout_width="match_parent">
     	<TextView android:layout_height="match_parent" android:text="@string/recovery" android:gravity="center_vertical|center_horizontal" android:textSize="40sp" android:layout_width="fill_parent"></TextView>
-    	<TextView android:text="This device is part of an experiment and contains test data. If found please contact us at: apollo67@gmail.com" 
+    	<TextView android:text="This device is part of an experiment and contains experiment data. If found please contact Bob at: 541-729-1053" 
     		android:layout_height="wrap_content" android:layout_width="wrap_content" 
     		android:layout_alignParentBottom="true" 
     		android:layout_centerHorizontal="true"

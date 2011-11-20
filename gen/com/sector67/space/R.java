@@ -23,21 +23,23 @@ public final class R {
     }
     public static final class layout {
         public static final int camera=0x7f030000;
-        public static final int launch=0x7f030001;
-        public static final int main=0x7f030002;
-        public static final int recovery=0x7f030003;
-        public static final int space=0x7f030004;
+        public static final int descent=0x7f030001;
+        public static final int launch=0x7f030002;
+        public static final int main=0x7f030003;
+        public static final int recovery=0x7f030004;
+        public static final int space=0x7f030005;
     }
     public static final class raw {
         public static final int launch_countdown=0x7f040000;
         public static final int loudbeep=0x7f040001;
     }
     public static final class string {
-        public static final int app_name=0x7f050008;
+        public static final int app_name=0x7f050009;
+        public static final int falling=0x7f050007;
         public static final int launching=0x7f050005;
         public static final int prefs=0x7f050000;
         public static final int primerLabel=0x7f050001;
-        public static final int recovery=0x7f050007;
+        public static final int recovery=0x7f050008;
         public static final int space=0x7f050006;
         public static final int triggerCurrent=0x7f050004;
         public static final int triggerCurrentLabel=0x7f050003;

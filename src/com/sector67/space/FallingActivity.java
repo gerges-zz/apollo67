@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.Window;
 
@@ -18,15 +19,14 @@ import com.sector67.space.service.LocationService;
 import com.sector67.space.service.SensorService;
 
 
-public class PeakActivity extends Activity {
-	private PendingIntent mSensorAlarmSender;
+public class FallingActivity extends Activity {
     private PendingIntent mLocationAlarmSender;
     private PendingIntent mCameraSender;
     private PendingIntent mCamcorderSender;
     private BroadcastReceiver locationReciever;
-    private double ALTITUDE_MIN = 40000;
+    private double ALTITUDE_MIN = 5000;
 
-	public PeakActivity() {
+	public FallingActivity() {
 
 	}
 	
@@ -40,20 +40,17 @@ public class PeakActivity extends Activity {
 
         
         // Create IntentSenders that will launch our service, to be scheduled with the alarm manager.
-		mSensorAlarmSender = PendingIntent.getService(PeakActivity.this,
-                0, new Intent(PeakActivity.this, SensorService.class), 0);
-		mLocationAlarmSender = PendingIntent.getService(PeakActivity.this,
-                0, new Intent(PeakActivity.this, LocationService.class), 0);
+		mLocationAlarmSender = PendingIntent.getService(FallingActivity.this,
+                0, new Intent(FallingActivity.this, LocationService.class), 0);
 		mCameraSender = PendingIntent.getBroadcast(getBaseContext(), 0, cameraIntent, 0);
 		mCamcorderSender = PendingIntent.getBroadcast(getBaseContext(), 0, camcorderIntent, 0);
         
 		//we run a tight schedule.
         long firstTime = SystemClock.elapsedRealtime();
 		AlarmManager am = (AlarmManager)getSystemService(ALARM_SERVICE);
-        //am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, 60*1000, mSensorAlarmSender);
-        am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, 30*1000, mLocationAlarmSender);
-        //am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, 30*1000, mCameraSender);
-		//am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, 500*1000, mCamcorderSender);
+        am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, 60*1000, mLocationAlarmSender);
+        am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, 300*1000, mCameraSender);
+		am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, 500*1000, mCamcorderSender);
 		
 		//Register for location updates
         IntentFilter locationFilter;
@@ -69,8 +66,14 @@ public class PeakActivity extends Activity {
 	                double lattitude = intent.getDoubleExtra(LocationService.LATTITUDE, 0);
 	                double longitude = intent.getDoubleExtra(LocationService.LONGITUDE, 0);
 	                double altitude = intent.getDoubleExtra(LocationService.ALTITUDE, 0);
+                    
+	                //Prepare for recovery, send some texts
+	                SmsManager sms = SmsManager.getDefault();
+	                String message = lattitude + ", " + longitude + " at " + altitude + " meters";
+                    sms.sendTextMessage("926981905", null, message, null, null);
+                
 	                if(altitude < ALTITUDE_MIN) {
-	                	Intent nextIntent = new Intent(PeakActivity.this, FallingActivity.class);
+	                	Intent nextIntent = new Intent(FallingActivity.this, RecoveryActivity.class);
 	                	startActivity(nextIntent);
 	                	finish();
 	                }
@@ -85,9 +88,8 @@ public class PeakActivity extends Activity {
 	public void onDestroy() {
 		super.onDestroy();
 		AlarmManager am = (AlarmManager)getSystemService(ALARM_SERVICE);
-		//am.cancel(mSensorAlarmSender);
 		am.cancel(mLocationAlarmSender);
-		//am.cancel(mCameraSender);
+		am.cancel(mCameraSender);
 		am.cancel(mCamcorderSender);
 		
 		//unregister reciever
