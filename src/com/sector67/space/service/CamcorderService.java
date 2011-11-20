@@ -32,14 +32,16 @@ public class CamcorderService extends Activity implements SurfaceHolder.Callback
 	private MediaRecorder mRecorder;
     private SurfaceView surfaceView;
 	private SurfaceHolder surfaceHolder;
-	private static final int TIME_TO_RECORD =  300000;
+	private int timeToRecord;
 
     private final DatabaseHelper dbHelper = new DatabaseHelper(this);
 
-    public void onCreate(Bundle icircle) {
-		super.onCreate(icircle);
+    public void onCreate(Bundle bundle) {
+		super.onCreate(bundle);
 		Log.d(CamcorderService.class.getName(), "Activity created");
 
+		timeToRecord = getIntent().getIntExtra("timeToRecord", 120*1000);
+		
         // Configure window
         getWindow().setFormat(PixelFormat.TRANSLUCENT);
         requestWindowFeature(Window.FEATURE_NO_TITLE); 
@@ -87,7 +89,7 @@ public class CamcorderService extends Activity implements SurfaceHolder.Callback
 	    CamcorderProfile cpHigh = CamcorderProfile
 	            .get(CamcorderProfile.QUALITY_HIGH);
 	    mRecorder.setProfile(cpHigh);
-	    mRecorder.setMaxDuration(TIME_TO_RECORD);
+	    mRecorder.setMaxDuration(timeToRecord);
 	    mRecorder.setMaxFileSize(100000000);
 	}
 
@@ -121,7 +123,7 @@ public class CamcorderService extends Activity implements SurfaceHolder.Callback
            public void run() { 
                CamcorderService.this.finish();
             }
-         }, TIME_TO_RECORD);
+         }, timeToRecord);
 
 	}
 

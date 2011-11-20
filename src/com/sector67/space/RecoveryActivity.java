@@ -31,6 +31,7 @@ public class RecoveryActivity extends Activity {
         setContentView(R.layout.recovery);
         
         Intent camcorderIntent = new Intent(getBaseContext(), CamcorderReciever.class);
+        camcorderIntent.putExtra("timeToRecord", 300*1000);
 
         // Create IntentSenders that will launch our service, to be scheduled with the alarm manager.
 		mCamcorderSender = PendingIntent.getBroadcast(getBaseContext(), 0, camcorderIntent, 0);

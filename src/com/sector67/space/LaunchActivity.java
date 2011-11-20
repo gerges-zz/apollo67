@@ -9,11 +9,9 @@ import android.app.PendingIntent;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.view.Window;
 
 import com.sector67.space.service.CamcorderReciever;
-import com.sector67.space.service.CamcorderService;
 
 
 public class LaunchActivity extends Activity {
@@ -30,6 +28,7 @@ public class LaunchActivity extends Activity {
         setContentView(R.layout.launch);
         
         Intent camcorderIntent = new Intent(getBaseContext(), CamcorderReciever.class);
+        camcorderIntent.putExtra("timeToRecord", 300*1000);
 
 		MediaPlayer mPlayer = MediaPlayer.create(this, R.raw.launch_countdown);
 		mPlayer.start();

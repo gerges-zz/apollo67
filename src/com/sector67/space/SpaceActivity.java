@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.SystemClock;
-import android.util.Log;
 import android.view.Window;
 
 import com.sector67.space.service.CamcorderReciever;
@@ -24,7 +23,7 @@ public class SpaceActivity extends Activity {
     private PendingIntent mCameraSender;
     private PendingIntent mCamcorderSender;
     private BroadcastReceiver locationReciever;
-    private double ALTITUDE_CAP = 50000;
+    private double ALTITUDE_CAP = 15240;
 
 	public SpaceActivity() {
 
@@ -37,6 +36,7 @@ public class SpaceActivity extends Activity {
         
         Intent cameraIntent = new Intent(getBaseContext(), CameraReciever.class);
         Intent camcorderIntent = new Intent(getBaseContext(), CamcorderReciever.class);
+        camcorderIntent.putExtra("timeToRecord", 30*1000);
 
         
         // Create IntentSenders that will launch our service, to be scheduled with the alarm manager.
@@ -50,10 +50,10 @@ public class SpaceActivity extends Activity {
 		//we run a tight schedule.
         long firstTime = SystemClock.elapsedRealtime();
 		AlarmManager am = (AlarmManager)getSystemService(ALARM_SERVICE);
-        //am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, 60*1000, mSensorAlarmSender);
-        am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, 30*1000, mLocationAlarmSender);
-        //am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, 30*1000, mCameraSender);
-		//am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, 500*1000, mCamcorderSender);
+        am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, 300*1000, mSensorAlarmSender);
+        am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, 60*1000, mLocationAlarmSender);
+        am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, 60*1000, mCameraSender);
+		//am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, 600*1000, mCamcorderSender);
 		
 		//Register for location updates
         IntentFilter locationFilter;
@@ -66,8 +66,6 @@ public class SpaceActivity extends Activity {
 	      @Override
 	        public void onReceive(Context context, Intent intent)//this method receives broadcast messages. Be sure to modify AndroidManifest.xml file in order to enable message receiving
 	        {
-	                double lattitude = intent.getDoubleExtra(LocationService.LATTITUDE, 0);
-	                double longitude = intent.getDoubleExtra(LocationService.LONGITUDE, 0);
 	                double altitude = intent.getDoubleExtra(LocationService.ALTITUDE, 0);
 	                if(altitude > ALTITUDE_CAP) {
 	                	Intent nextIntent = new Intent(SpaceActivity.this, PeakActivity.class);
@@ -85,9 +83,9 @@ public class SpaceActivity extends Activity {
 	public void onDestroy() {
 		super.onDestroy();
 		AlarmManager am = (AlarmManager)getSystemService(ALARM_SERVICE);
-		//am.cancel(mSensorAlarmSender);
+		am.cancel(mSensorAlarmSender);
 		am.cancel(mLocationAlarmSender);
-		//am.cancel(mCameraSender);
+		am.cancel(mCameraSender);
 		am.cancel(mCamcorderSender);
 		
 		//unregister reciever

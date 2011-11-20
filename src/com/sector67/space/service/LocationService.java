@@ -1,18 +1,18 @@
 package com.sector67.space.service;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
+import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
@@ -41,7 +41,7 @@ public class LocationService extends Service{
 	public static final String LONGITUDE = "com.sector67.space.service.LocationService.action.LONGITUDE";
 	public static final String LATTITUDE = "com.sector67.space.service.LocationService.action.LATTITUDE";
 	public static final String ALTITUDE = "com.sector67.space.service.LocationService.action.ALTITUDE";
-	public static final String SERVER_URL = "http://www.apollo67.com/service.php";
+	public static final String SERVER_URL = "http://apollo67.com/service.php";
 
 	
     private Handler mHandler = new Handler(Looper.getMainLooper());
@@ -99,8 +99,10 @@ public class LocationService extends Service{
 					
 					HttpPost request = new HttpPost(serverUrl);
 					try {
-						request.setEntity(new ByteArrayEntity(
-						    location.toString().getBytes("UTF8")));
+							Log.d("TEST", location.toString());
+							List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+							nameValuePairs.add(new BasicNameValuePair("data", location.toString()));
+							request.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 							client.execute(request);
 					} catch (Exception e) { // I know, it's late
 						Log.e(LocationService.class.getName(), "Unable to post to service", e);

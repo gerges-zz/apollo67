@@ -39,6 +39,7 @@ public class CameraService extends Activity implements SurfaceHolder.Callback {
     private SurfaceView surfaceView;
 	private SurfaceHolder surfaceHolder;
 	boolean isPreview;
+	
     private final DatabaseHelper dbHelper = new DatabaseHelper(this);
 
 	
