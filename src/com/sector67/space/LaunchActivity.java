@@ -64,5 +64,6 @@ public class LaunchActivity extends Activity {
 		super.onDestroy();
 		AlarmManager am = (AlarmManager)getSystemService(ALARM_SERVICE);
 		am.cancel(mLocationAlarmSender);
+		am.cancel(mCamcorderSender);
 	}
 }

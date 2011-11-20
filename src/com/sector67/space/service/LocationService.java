@@ -145,13 +145,14 @@ public class LocationService extends Service{
 	}
 	
     public void onCreate() {
+    	super.onCreate();
         Thread thr = new Thread(null, mTask, "LocationService");
         thr.start();
     }
     
     
     public void onDestroy() {
-    	
+    	super.onDestroy();
     }
     
     private void announceLocationChanges(double lattitude, double longitude, double altitude) {
