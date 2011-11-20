@@ -75,13 +75,14 @@ public class FallingActivity extends Activity {
 	                //Prepare for recovery, send some texts
 	                SmsManager sms = SmsManager.getDefault();
 	                String message = lattitude + ", " + longitude + " at " + altitude + " meters";
-                    sms.sendTextMessage("926981905", null, message, null, null);
+                    sms.sendTextMessage("9206981905", null, message, null, null);
                 
 	                if(altitude < ALTITUDE_MIN) {
 	                	if(!hasEnded) {
 		                	Intent nextIntent = new Intent(FallingActivity.this, RecoveryActivity.class);
 		                	stopCameraAndCamcorder();
 		                	startActivity(nextIntent);
+		                    unregisterReceiver(locationReciever);
 		                	finish();
 		                	hasEnded = true;
 	                	} 
@@ -101,8 +102,6 @@ public class FallingActivity extends Activity {
 		am.cancel(mCameraSender);
 		am.cancel(mCamcorderSender);
 		am.cancel(mSensorAlarmSender);
-		//unregister reciever
-        unregisterReceiver(locationReciever);
 
 	}
 	

@@ -48,27 +48,25 @@ public class RecoveryActivity extends Activity {
 		
 		alarmRepeat = new Timer();
 
-		alarmRepeat.scheduleAtFixedRate(new TimerTask(){
-           public void run() { 
-       		MediaPlayer mPlayer = MediaPlayer.create(RecoveryActivity.this, R.raw.loudbeep);
-    		mPlayer.start();
-           }
-         }, 0, ALARM_TIME);
-		
 		//Wait for the right moment
         long firstTime = SystemClock.elapsedRealtime();
 		AlarmManager am = (AlarmManager)getSystemService(ALARM_SERVICE);
-		am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, 500*1000, mCamcorderSender);
-        am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, 60*1000, mLocationAlarmSender);
+		am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, 300*1000, mCamcorderSender);
+        am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, 300*1000, mLocationAlarmSender);
         alarmRepeat.schedule(new TimerTask(){
-           public void run() { 
-       			AlarmManager am = (AlarmManager)getSystemService(ALARM_SERVICE);
-       			am.cancel(mLocationAlarmSender);
-       	        long firstTime = SystemClock.elapsedRealtime();
-       	        am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, 300*1000, mLocationAlarmSender);
-           }
-         }, 0, 600*1000);
+            public void run() { 
+        			AlarmManager am = (AlarmManager)getSystemService(ALARM_SERVICE);
+        			am.cancel(mCamcorderSender);
+            }
+          }, 0, 300*1000);
         
+		alarmRepeat.scheduleAtFixedRate(new TimerTask(){
+	        public void run() { 
+	       		MediaPlayer mPlayer = MediaPlayer.create(RecoveryActivity.this, R.raw.loudbeep);
+	    		mPlayer.start();
+	           }
+	         }, 330*1000, ALARM_TIME);
+			
 		//Register for location updates
         IntentFilter locationFilter;
         locationFilter = new IntentFilter(LocationService.LOCATION_UPDATE);
@@ -88,7 +86,7 @@ public class RecoveryActivity extends Activity {
                 //Prepare for recovery, send some texts
                 SmsManager sms = SmsManager.getDefault();
                 String message = lattitude + ", " + longitude + " at " + altitude + " meters";
-                sms.sendTextMessage("926981905", null, message, null, null);
+                sms.sendTextMessage("9206981905", null, message, null, null);
 	        }
 	    }
 	 

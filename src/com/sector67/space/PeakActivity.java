@@ -86,6 +86,7 @@ public class PeakActivity extends Activity {
 		                	Intent nextIntent = new Intent(PeakActivity.this, FallingActivity.class);
 		                	stopCameraAndCamcorder();
 		                	startActivity(nextIntent);
+		                    unregisterReceiver(locationReciever);
 		                	finish();
 		                	hasEnded = true;
 	                	}
@@ -116,9 +117,7 @@ public class PeakActivity extends Activity {
 		am.cancel(mLocationAlarmSender);
 		am.cancel(mCameraSender);
 		am.cancel(mCamcorderSender);
-		
-		//unregister reciever
-        unregisterReceiver(locationReciever);
+
 
 	}
 	

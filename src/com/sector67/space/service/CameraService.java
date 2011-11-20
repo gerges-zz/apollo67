@@ -202,6 +202,10 @@ public class CameraService extends Activity implements SurfaceHolder.Callback {
 	      @Override
 	        public void onReceive(Context context, Intent intent)//this method receives broadcast messages. Be sure to modify AndroidManifest.xml file in order to enable message receiving
 	        {
+	    	  if(isPreview) {
+	    		  camera.stopPreview();
+	    		  camera.release();
+	    	  }
 	    	  finish();
 	        }
 	    }

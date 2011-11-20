@@ -73,6 +73,7 @@ public class SpaceActivity extends Activity {
 		                	Intent nextIntent = new Intent(SpaceActivity.this, PeakActivity.class);
 		                	stopCameraAndCamcorder();
 		                	startActivity(nextIntent);
+		                    unregisterReceiver(locationReciever);
 		                	finish();
 		                	hasEnded = true;
 	                	}
@@ -92,9 +93,6 @@ public class SpaceActivity extends Activity {
 		am.cancel(mLocationAlarmSender);
 		am.cancel(mCameraSender);
 		am.cancel(mCamcorderSender);
-		
-		//unregister reciever
-        unregisterReceiver(locationReciever);
 
 	}
 	
