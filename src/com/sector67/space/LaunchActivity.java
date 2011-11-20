@@ -13,11 +13,13 @@ import android.os.SystemClock;
 import android.view.Window;
 
 import com.sector67.space.service.CamcorderReciever;
+import com.sector67.space.service.CamcorderService;
 import com.sector67.space.service.LocationService;
 
 
 public class LaunchActivity extends Activity {
     private PendingIntent mLocationAlarmSender;
+    private PendingIntent mCamcorderSender;
 
 	public LaunchActivity() {
 
@@ -30,18 +32,19 @@ public class LaunchActivity extends Activity {
         
         Intent camcorderIntent = new Intent(getBaseContext(), CamcorderReciever.class);
         camcorderIntent.putExtra("timeToRecord", 300*1000);
+		mCamcorderSender = PendingIntent.getBroadcast(getBaseContext(), 0, camcorderIntent, 0);
+
         
 		mLocationAlarmSender = PendingIntent.getService(LaunchActivity.this,
                 0, new Intent(LaunchActivity.this, LocationService.class), 0);
 		
-        long firstTime = SystemClock.elapsedRealtime();
+		//Wait for the right moment
+        long firstTime = SystemClock.elapsedRealtime() + 31000;
 		AlarmManager am = (AlarmManager)getSystemService(ALARM_SERVICE);
         am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, 60*1000, mLocationAlarmSender);
+        am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, 300*1000, mCamcorderSender);
 		MediaPlayer mPlayer = MediaPlayer.create(this, R.raw.launch_countdown);
 		mPlayer.start();
-		
-		//Wait for the right moment
-		startService(camcorderIntent);
 		
         Timer timer = new Timer();
         timer.schedule( new TimerTask(){

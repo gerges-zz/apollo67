@@ -54,7 +54,7 @@ public class FallingActivity extends Activity {
         am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, 45*1000, mSensorAlarmSender);
         am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, 30*1000, mLocationAlarmSender);
         am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, 60*1000, mCameraSender);
-		am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, 500*1000, mCamcorderSender);
+		am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, 60*1000, mCamcorderSender);
 		
 		//Register for location updates
         IntentFilter locationFilter;
