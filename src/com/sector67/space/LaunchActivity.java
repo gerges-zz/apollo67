@@ -20,6 +20,9 @@ import com.sector67.space.service.LocationService;
 public class LaunchActivity extends Activity {
     private PendingIntent mLocationAlarmSender;
     private PendingIntent mCamcorderSender;
+    private boolean hasEnded = false;
+
+
 
 	public LaunchActivity() {
 
@@ -49,10 +52,13 @@ public class LaunchActivity extends Activity {
         Timer timer = new Timer();
         timer.schedule( new TimerTask(){
            public void run() { 
-               Intent spaceIntent = new Intent(getBaseContext(), SpaceActivity.class);
-               stopCameraAndCamcorder();
-        	   startActivity(spaceIntent);
-        	   finish();
+	           	if(!hasEnded) {
+	               Intent spaceIntent = new Intent(getBaseContext(), SpaceActivity.class);
+	               stopCameraAndCamcorder();
+	        	   startActivity(spaceIntent);
+	        	   finish();
+	        	   hasEnded = true;
+	           	}
             }
          }, 300*1000);
 

@@ -23,6 +23,7 @@ public class SpaceActivity extends Activity {
     private PendingIntent mCameraSender;
     private PendingIntent mCamcorderSender;
     private BroadcastReceiver locationReciever;
+    private boolean hasEnded = false;
     private double ALTITUDE_CAP = 15240;
 
 	public SpaceActivity() {
@@ -68,10 +69,13 @@ public class SpaceActivity extends Activity {
 	        {
 	                double altitude = intent.getDoubleExtra(LocationService.ALTITUDE, 0);
 	                if(altitude > ALTITUDE_CAP) {
-	                	Intent nextIntent = new Intent(SpaceActivity.this, PeakActivity.class);
-	                	stopCameraAndCamcorder();
-	                	startActivity(nextIntent);
-	                	finish();
+	                	if(!hasEnded) {
+		                	Intent nextIntent = new Intent(SpaceActivity.this, PeakActivity.class);
+		                	stopCameraAndCamcorder();
+		                	startActivity(nextIntent);
+		                	finish();
+		                	hasEnded = true;
+	                	}
 	                }
 	                
 	        }

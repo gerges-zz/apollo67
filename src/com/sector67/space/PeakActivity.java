@@ -26,6 +26,7 @@ public class PeakActivity extends Activity {
     private PendingIntent mCameraSender;
     private PendingIntent mCamcorderSender;
     private BroadcastReceiver locationReciever;
+    private boolean hasEnded = false;
     private double ALTITUDE_MIN = 12192;
 
 	public PeakActivity() {
@@ -81,10 +82,13 @@ public class PeakActivity extends Activity {
 	        {
 	                double altitude = intent.getDoubleExtra(LocationService.ALTITUDE, 0);
 	                if(altitude < ALTITUDE_MIN) {
-	                	Intent nextIntent = new Intent(PeakActivity.this, FallingActivity.class);
-	                	stopCameraAndCamcorder();
-	                	startActivity(nextIntent);
-	                	finish();
+	                	if(!hasEnded) {
+		                	Intent nextIntent = new Intent(PeakActivity.this, FallingActivity.class);
+		                	stopCameraAndCamcorder();
+		                	startActivity(nextIntent);
+		                	finish();
+		                	hasEnded = true;
+	                	}
 	                }
 	                
 	        }

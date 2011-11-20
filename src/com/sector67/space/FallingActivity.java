@@ -24,6 +24,7 @@ public class FallingActivity extends Activity {
     private PendingIntent mCameraSender;
     private PendingIntent mCamcorderSender;
     private BroadcastReceiver locationReciever;
+    private boolean hasEnded = false;
     private double ALTITUDE_MIN = 1524;
 
 	public FallingActivity() {
@@ -77,10 +78,13 @@ public class FallingActivity extends Activity {
                     sms.sendTextMessage("926981905", null, message, null, null);
                 
 	                if(altitude < ALTITUDE_MIN) {
-	                	Intent nextIntent = new Intent(FallingActivity.this, RecoveryActivity.class);
-	                	stopCameraAndCamcorder();
-	                	startActivity(nextIntent);
-	                	finish();
+	                	if(!hasEnded) {
+		                	Intent nextIntent = new Intent(FallingActivity.this, RecoveryActivity.class);
+		                	stopCameraAndCamcorder();
+		                	startActivity(nextIntent);
+		                	finish();
+		                	hasEnded = true;
+	                	} 
 	                }
 	                
 	        }
