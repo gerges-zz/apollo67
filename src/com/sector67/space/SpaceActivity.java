@@ -69,6 +69,7 @@ public class SpaceActivity extends Activity {
 	                double altitude = intent.getDoubleExtra(LocationService.ALTITUDE, 0);
 	                if(altitude > ALTITUDE_CAP) {
 	                	Intent nextIntent = new Intent(SpaceActivity.this, PeakActivity.class);
+	                	
 	                	startActivity(nextIntent);
 	                	finish();
 	                }

@@ -1,5 +1,8 @@
 package com.sector67.space;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -13,6 +16,7 @@ import android.view.Window;
 
 import com.sector67.space.service.CamcorderReciever;
 import com.sector67.space.service.CameraReciever;
+import com.sector67.space.service.CameraService;
 import com.sector67.space.service.LocationService;
 import com.sector67.space.service.SensorService;
 
@@ -36,7 +40,7 @@ public class PeakActivity extends Activity {
         
         Intent cameraIntent = new Intent(getBaseContext(), CameraReciever.class);
         Intent camcorderIntent = new Intent(getBaseContext(), CamcorderReciever.class);
-        camcorderIntent.putExtra("timeToRecord", 60*1000);
+        camcorderIntent.putExtra("timeToRecord", 300*1000);
 
         
         // Create IntentSenders that will launch our service, to be scheduled with the alarm manager.
@@ -52,8 +56,18 @@ public class PeakActivity extends Activity {
 		AlarmManager am = (AlarmManager)getSystemService(ALARM_SERVICE);
         am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, 300*1000, mSensorAlarmSender);
         am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, 60*1000, mLocationAlarmSender);
-        am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, 30*1000, mCameraSender);
-		am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime + 15000, 300*1000, mCamcorderSender);
+        am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, 500*1000, mCamcorderSender);
+        
+        Timer timer = new Timer();
+        timer.schedule( new TimerTask(){
+           public void run() { 
+       			AlarmManager am = (AlarmManager)getSystemService(ALARM_SERVICE);
+       	        long firstTime = SystemClock.elapsedRealtime();
+       	        am.cancel(mCamcorderSender);
+       	        am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, 30*1000, mCameraSender);
+            }
+         }, 330*1000);
+
 		
 		//Register for location updates
         IntentFilter locationFilter;

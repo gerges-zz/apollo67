@@ -37,38 +37,44 @@ public class CamcorderService extends Activity implements SurfaceHolder.Callback
     private final DatabaseHelper dbHelper = new DatabaseHelper(this);
 
     public void onCreate(Bundle bundle) {
+    	try {
 		super.onCreate(bundle);
-		Log.d(CamcorderService.class.getName(), "Activity created");
-
-		timeToRecord = getIntent().getIntExtra("timeToRecord", 120*1000);
-		
-        // Configure window
-        getWindow().setFormat(PixelFormat.TRANSLUCENT);
-        requestWindowFeature(Window.FEATURE_NO_TITLE); 
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-        WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
-        // Use camera.xml as content view
-        setContentView(R.layout.camera);
-
-        // Get surface view and initialize surface holder
-        surfaceView = (SurfaceView) findViewById(R.id.surface_camera);
-        surfaceHolder = surfaceView.getHolder();
-        surfaceHolder.addCallback(this);
-        surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-        
-        mRecorder = new MediaRecorder();
+			Log.d(CamcorderService.class.getName(), "Activity created");
+	
+			timeToRecord = getIntent().getIntExtra("timeToRecord", 120*1000);
+			
+	        // Configure window
+	        getWindow().setFormat(PixelFormat.TRANSLUCENT);
+	        requestWindowFeature(Window.FEATURE_NO_TITLE); 
+	        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+	        WindowManager.LayoutParams.FLAG_FULLSCREEN);
+	
+	        // Use camera.xml as content view
+	        setContentView(R.layout.camera);
+	
+	        // Get surface view and initialize surface holder
+	        surfaceView = (SurfaceView) findViewById(R.id.surface_camera);
+	        surfaceHolder = surfaceView.getHolder();
+	        surfaceHolder.addCallback(this);
+	        surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+	        
+	        mRecorder = new MediaRecorder();
+    	} catch (Exception e) {
+    		
+    	}
     }
     
 	protected void onResume() {
 		super.onResume();
-
-
     }
     
     public void onDestroy() {
     	super.onDestroy();
+    	try {
     	mRecorder.release();
+    	} catch (Exception e) {
+    		
+    	}
     }
 
     
@@ -97,35 +103,38 @@ public class CamcorderService extends Activity implements SurfaceHolder.Callback
 	
 	@Override
 	public void surfaceCreated(SurfaceHolder holder) {
-		Format fileNameFormatter = new SimpleDateFormat("yyyyMMdd-kk-mm-ss-SSS");
-		String fileName = fileNameFormatter.format(new Date());
-		initRecorder(fileName);
-        try {
-        	mRecorder.setPreviewDisplay(surfaceHolder.getSurface());
-			mRecorder.prepare();
-	        mRecorder.start();
-	        Map<String, String> dataMap = new HashMap<String, String>();
-			dataMap.put("fileName", fileName);
-			JSONObject dataObj = new JSONObject(dataMap);
-			try {
-				dbHelper.getSensorDao().create(new SensorActivity("Camecorder", new Date(), dataObj.toString()));
-			} catch (SQLException e) {
-    			Log.e(CameraService.class.getName(), "Unable to write to database", e);
+		try {
+			Format fileNameFormatter = new SimpleDateFormat("yyyyMMdd-kk-mm-ss-SSS");
+			String fileName = fileNameFormatter.format(new Date());
+			initRecorder(fileName);
+	        try {
+	        	mRecorder.setPreviewDisplay(surfaceHolder.getSurface());
+				mRecorder.prepare();
+		        mRecorder.start();
+		        Map<String, String> dataMap = new HashMap<String, String>();
+				dataMap.put("fileName", fileName);
+				JSONObject dataObj = new JSONObject(dataMap);
+				try {
+					dbHelper.getSensorDao().create(new SensorActivity("Camecorder", new Date(), dataObj.toString()));
+				} catch (SQLException e) {
+	    			Log.e(CameraService.class.getName(), "Unable to write to database", e);
+				}
+			} catch (IllegalStateException e) {
+				Log.e(CamcorderService.class.getName(), "Unable to start recording", e);
+			} catch (IOException e) {
+				Log.e(CamcorderService.class.getName(), "Unable to start recording", e);
 			}
-		} catch (IllegalStateException e) {
-			Log.e(CamcorderService.class.getName(), "Unable to start recording", e);
-		} catch (IOException e) {
-			Log.e(CamcorderService.class.getName(), "Unable to start recording", e);
+	        
+	        Timer timer = new Timer();
+	
+	        timer.schedule( new TimerTask(){
+	           public void run() { 
+	               CamcorderService.this.finish();
+	            }
+	         }, timeToRecord);
+		} catch (Exception e) {
+			
 		}
-        
-        Timer timer = new Timer();
-
-        timer.schedule( new TimerTask(){
-           public void run() { 
-               CamcorderService.this.finish();
-            }
-         }, timeToRecord);
-
 	}
 
 	@Override

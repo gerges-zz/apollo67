@@ -138,42 +138,54 @@ public class CameraService extends Activity implements SurfaceHolder.Callback {
 
 	@Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-        // Surface size is changed so stop preview
-        if (isPreview) {
-                camera.stopPreview();
-        }
-
-        // Set camera properties to have correct preview size
-        Camera.Parameters p = camera.getParameters();
-        camera.setDisplayOrientation(CameraService.this.getWindowManager().getDefaultDisplay().getRotation());
-        p.setPreviewSize(width, height);
-        p.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
-        p.setJpegQuality(100);
-        camera.setParameters(p);
-
         try {
-               camera.setPreviewDisplay(holder);
-        } 
-        catch (IOException e) {
-                e.printStackTrace();
+			// Surface size is changed so stop preview
+		    if (isPreview) {
+		            camera.stopPreview();
+		    }
+		
+		    // Set camera properties to have correct preview size
+		    Camera.Parameters p = camera.getParameters();
+		    camera.setDisplayOrientation(CameraService.this.getWindowManager().getDefaultDisplay().getRotation());
+		    p.setPreviewSize(width, height);
+		    p.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+		    p.setJpegQuality(100);
+		    camera.setParameters(p);
+		
+		    try {
+		           camera.setPreviewDisplay(holder);
+		    } 
+		    catch (IOException e) {
+		            e.printStackTrace();
+		    }
+		
+		    // Start preview again
+		    camera.startPreview();
+		    isPreview = true;
+		    camera.takePicture(shutterCallback, null, jpegCallback);
+        } catch (Exception e) {
+        	
         }
-
-        // Start preview again
-        camera.startPreview();
-        isPreview = true;
-        camera.takePicture(shutterCallback, null, jpegCallback);
 	}
 
 	@Override
 	public void surfaceCreated(SurfaceHolder holder) {
-        camera = Camera.open(); 
+		try {
+			camera = Camera.open();
+		} catch (Exception e) {
+			
+		}
 	}
 
 	@Override
 	public void surfaceDestroyed(SurfaceHolder holder) {
-		camera.stopPreview();
-        isPreview = false;
-        camera.release();
+		try {
+			camera.stopPreview();
+		    isPreview = false;
+		    camera.release();
+        } catch (Exception e) {
+        	
+        }
 	}
 
 }

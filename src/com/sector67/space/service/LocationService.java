@@ -99,7 +99,6 @@ public class LocationService extends Service{
 					
 					HttpPost request = new HttpPost(serverUrl);
 					try {
-							Log.d("TEST", location.toString());
 							List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
 							nameValuePairs.add(new BasicNameValuePair("data", location.toString()));
 							request.setEntity(new UrlEncodedFormEntity(nameValuePairs));

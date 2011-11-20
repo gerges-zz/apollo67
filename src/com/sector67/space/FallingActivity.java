@@ -33,7 +33,7 @@ public class FallingActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
     	super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.space);
+        setContentView(R.layout.descent);
         
         Intent cameraIntent = new Intent(getBaseContext(), CameraReciever.class);
         Intent camcorderIntent = new Intent(getBaseContext(), CamcorderReciever.class);
