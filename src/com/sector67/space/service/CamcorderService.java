@@ -68,6 +68,7 @@ public class CamcorderService extends Activity implements SurfaceHolder.Callback
     
     public void onDestroy() {
     	super.onDestroy();
+    	mRecorder.release();
     }
 
     
