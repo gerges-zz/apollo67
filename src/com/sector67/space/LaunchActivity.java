@@ -13,7 +13,6 @@ import android.os.SystemClock;
 import android.view.Window;
 
 import com.sector67.space.service.CamcorderReciever;
-import com.sector67.space.service.CamcorderService;
 import com.sector67.space.service.LocationService;
 
 
