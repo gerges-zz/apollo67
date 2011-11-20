@@ -78,6 +78,7 @@ public class FallingActivity extends Activity {
                 
 	                if(altitude < ALTITUDE_MIN) {
 	                	Intent nextIntent = new Intent(FallingActivity.this, RecoveryActivity.class);
+	                	stopCameraAndCamcorder();
 	                	startActivity(nextIntent);
 	                	finish();
 	                }
@@ -99,6 +100,17 @@ public class FallingActivity extends Activity {
 		//unregister reciever
         unregisterReceiver(locationReciever);
 
+	}
+	
+	private void stopCameraAndCamcorder() {
+		//Stop Camcorder
+		Intent stopCamcorderReciever = new Intent(FallingActivity.this, CamcorderReciever.class);
+		stopCamcorderReciever.putExtra("action", "stop");
+		sendBroadcast(stopCamcorderReciever);
+		//Stop Camera
+		Intent stopCameraReciever = new Intent(FallingActivity.this, CameraReciever.class);
+		stopCameraReciever.putExtra("action", "stop");
+		sendBroadcast(stopCameraReciever);
 	}
 	
 }

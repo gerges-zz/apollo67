@@ -14,6 +14,10 @@ import java.util.TimerTask;
 import org.json.JSONObject;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.PixelFormat;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
@@ -33,6 +37,7 @@ public class CamcorderService extends Activity implements SurfaceHolder.Callback
     private SurfaceView surfaceView;
 	private SurfaceHolder surfaceHolder;
 	private int timeToRecord;
+    private BroadcastReceiver stopReciever;
 
     private final DatabaseHelper dbHelper = new DatabaseHelper(this);
 
@@ -59,6 +64,11 @@ public class CamcorderService extends Activity implements SurfaceHolder.Callback
 	        surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 	        
 	        mRecorder = new MediaRecorder();
+	        
+			//Register for stop updates
+	        IntentFilter stopFilter = new IntentFilter(CamcorderReciever.CAMCORDER_STOP);
+	        stopReciever = new CamcorderStopReciever();
+	        registerReceiver(stopReciever, stopFilter);
     	} catch (Exception e) {
     		
     	}
@@ -70,6 +80,8 @@ public class CamcorderService extends Activity implements SurfaceHolder.Callback
     
     public void onDestroy() {
     	super.onDestroy();
+		//unregister reciever
+        unregisterReceiver(stopReciever);
     	try {
     	mRecorder.release();
     	} catch (Exception e) {
@@ -136,6 +148,14 @@ public class CamcorderService extends Activity implements SurfaceHolder.Callback
 			
 		}
 	}
+	
+	 public class CamcorderStopReciever extends BroadcastReceiver {
+	      @Override
+	        public void onReceive(Context context, Intent intent)//this method receives broadcast messages. Be sure to modify AndroidManifest.xml file in order to enable message receiving
+	        {
+	    	  finish();
+	        }
+	    }
 
 	@Override
 	public void surfaceDestroyed(SurfaceHolder holder) {

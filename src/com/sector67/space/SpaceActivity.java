@@ -69,7 +69,7 @@ public class SpaceActivity extends Activity {
 	                double altitude = intent.getDoubleExtra(LocationService.ALTITUDE, 0);
 	                if(altitude > ALTITUDE_CAP) {
 	                	Intent nextIntent = new Intent(SpaceActivity.this, PeakActivity.class);
-	                	
+	                	stopCameraAndCamcorder();
 	                	startActivity(nextIntent);
 	                	finish();
 	                }
@@ -92,6 +92,17 @@ public class SpaceActivity extends Activity {
 		//unregister reciever
         unregisterReceiver(locationReciever);
 
+	}
+	
+	private void stopCameraAndCamcorder() {
+		//Stop Camcorder
+		Intent stopCamcorderReciever = new Intent(SpaceActivity.this, CamcorderReciever.class);
+		stopCamcorderReciever.putExtra("action", "stop");
+		sendBroadcast(stopCamcorderReciever);
+		//Stop Camera
+		Intent stopCameraReciever = new Intent(SpaceActivity.this, CameraReciever.class);
+		stopCameraReciever.putExtra("action", "stop");
+		sendBroadcast(stopCameraReciever);
 	}
 	
 }

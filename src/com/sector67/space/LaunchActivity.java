@@ -13,6 +13,7 @@ import android.os.SystemClock;
 import android.view.Window;
 
 import com.sector67.space.service.CamcorderReciever;
+import com.sector67.space.service.CameraReciever;
 import com.sector67.space.service.LocationService;
 
 
@@ -49,6 +50,7 @@ public class LaunchActivity extends Activity {
         timer.schedule( new TimerTask(){
            public void run() { 
                Intent spaceIntent = new Intent(getBaseContext(), SpaceActivity.class);
+               stopCameraAndCamcorder();
         	   startActivity(spaceIntent);
         	   finish();
             }
@@ -65,5 +67,16 @@ public class LaunchActivity extends Activity {
 		AlarmManager am = (AlarmManager)getSystemService(ALARM_SERVICE);
 		am.cancel(mLocationAlarmSender);
 		am.cancel(mCamcorderSender);
+	}
+	
+	private void stopCameraAndCamcorder() {
+		//Stop Camcorder
+		Intent stopCamcorderReciever = new Intent(LaunchActivity.this, CamcorderReciever.class);
+		stopCamcorderReciever.putExtra("action", "stop");
+		sendBroadcast(stopCamcorderReciever);
+		//Stop Camera
+		Intent stopCameraReciever = new Intent(LaunchActivity.this, CameraReciever.class);
+		stopCameraReciever.putExtra("action", "stop");
+		sendBroadcast(stopCameraReciever);
 	}
 }

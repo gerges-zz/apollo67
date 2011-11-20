@@ -15,7 +15,10 @@ import java.util.Map;
 import org.json.JSONObject;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
@@ -39,6 +42,7 @@ public class CameraService extends Activity implements SurfaceHolder.Callback {
     private SurfaceView surfaceView;
 	private SurfaceHolder surfaceHolder;
 	boolean isPreview;
+    private BroadcastReceiver stopReciever;
 	
     private final DatabaseHelper dbHelper = new DatabaseHelper(this);
 
@@ -84,6 +88,11 @@ public class CameraService extends Activity implements SurfaceHolder.Callback {
         surfaceHolder = surfaceView.getHolder();
         surfaceHolder.addCallback(this);
         surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+        
+		//Register for stop updates
+        IntentFilter stopFilter = new IntentFilter(CameraReciever.CAMERA_STOP);
+        stopReciever = new CameraStopReciever();
+        registerReceiver(stopReciever, stopFilter);
     }
     
 	protected void onResume() {
@@ -94,6 +103,7 @@ public class CameraService extends Activity implements SurfaceHolder.Callback {
     
     public void onDestroy() {
     	super.onDestroy();
+        unregisterReceiver(stopReciever);
     }
 	
 	public static boolean storeByteImage(Context mContext, byte[] imageData,
@@ -187,5 +197,13 @@ public class CameraService extends Activity implements SurfaceHolder.Callback {
         	
         }
 	}
+	
+	 public class CameraStopReciever extends BroadcastReceiver {
+	      @Override
+	        public void onReceive(Context context, Intent intent)//this method receives broadcast messages. Be sure to modify AndroidManifest.xml file in order to enable message receiving
+	        {
+	    	  finish();
+	        }
+	    }
 
 }

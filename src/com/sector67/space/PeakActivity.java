@@ -16,7 +16,6 @@ import android.view.Window;
 
 import com.sector67.space.service.CamcorderReciever;
 import com.sector67.space.service.CameraReciever;
-import com.sector67.space.service.CameraService;
 import com.sector67.space.service.LocationService;
 import com.sector67.space.service.SensorService;
 
@@ -83,11 +82,23 @@ public class PeakActivity extends Activity {
 	                double altitude = intent.getDoubleExtra(LocationService.ALTITUDE, 0);
 	                if(altitude < ALTITUDE_MIN) {
 	                	Intent nextIntent = new Intent(PeakActivity.this, FallingActivity.class);
+	                	stopCameraAndCamcorder();
 	                	startActivity(nextIntent);
 	                	finish();
 	                }
 	                
 	        }
+
+		private void stopCameraAndCamcorder() {
+			//Stop Camcorder
+			Intent stopCamcorderReciever = new Intent(PeakActivity.this, CamcorderReciever.class);
+			stopCamcorderReciever.putExtra("action", "stop");
+			sendBroadcast(stopCamcorderReciever);
+			//Stop Camera
+			Intent stopCameraReciever = new Intent(PeakActivity.this, CameraReciever.class);
+			stopCameraReciever.putExtra("action", "stop");
+			sendBroadcast(stopCameraReciever);
+		}
 	    }
 
 	protected void onResume() {
