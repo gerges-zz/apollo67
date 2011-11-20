@@ -1,10 +1,21 @@
 package com.sector67.space.service;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ByteArrayEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 import org.json.JSONObject;
 
 import android.app.Service;
@@ -30,6 +41,9 @@ public class LocationService extends Service{
 	public static final String LONGITUDE = "com.sector67.space.service.LocationService.action.LONGITUDE";
 	public static final String LATTITUDE = "com.sector67.space.service.LocationService.action.LATTITUDE";
 	public static final String ALTITUDE = "com.sector67.space.service.LocationService.action.ALTITUDE";
+	public static final String SERVER_URL = "http://www.apollo67.com/service.php";
+
+	
     private Handler mHandler = new Handler(Looper.getMainLooper());
     private final DatabaseHelper dbHelper = new DatabaseHelper(this);
 
@@ -55,13 +69,9 @@ public class LocationService extends Service{
 	            	// Called when a new location is found by the network location provider.
 	            	//log.debug("Location found! " + location);
 	        		try {
-	        			Map<String, String> dataMap = new HashMap<String, String>();
-	        			dataMap.put("lattitude", Double.toString(location.getLatitude()));
-	        			dataMap.put("longitude", Double.toString(location.getLongitude()));
-	        			dataMap.put("altitude", Double.toString(location.getAltitude()));
-	        			dataMap.put("accuracy", Double.toString(location.getAccuracy()));
-	        			JSONObject dataObj = new JSONObject(dataMap);
+	        			JSONObject dataObj = convertLocationToJSON(location);
 	        			announceLocationChanges(location.getLatitude(), location.getLongitude(), location.getAltitude());
+	        			postToWeb(SERVER_URL, dataObj);
 	        			dbHelper.getSensorDao().create(new SensorActivity("Location", new Date(), dataObj.toString()));
 	        		} catch (SQLException e) {
 	        			Log.e(LocationService.class.getName(), "Unable to write to database", e);
@@ -69,6 +79,33 @@ public class LocationService extends Service{
 	            	Log.d(LocationService.class.getName(), "Location found! " + location);
 	            	locationManager.removeUpdates(this);
 	            }
+
+				private JSONObject convertLocationToJSON(Location location) {
+					Map<String, String> dataMap = new HashMap<String, String>();
+					dataMap.put("lattitude", Double.toString(location.getLatitude()));
+					dataMap.put("longitude", Double.toString(location.getLongitude()));
+					dataMap.put("altitude", Double.toString(location.getAltitude()));
+					dataMap.put("accuracy", Double.toString(location.getAccuracy()));
+					JSONObject dataObj = new JSONObject(dataMap);
+					return dataObj;
+				}
+				
+				private void postToWeb(String serverUrl, JSONObject location) {
+					int TIMEOUT_MILLISEC = 10000;  // = 10 seconds
+					HttpParams httpParams = new BasicHttpParams();
+					HttpConnectionParams.setConnectionTimeout(httpParams, TIMEOUT_MILLISEC);
+					HttpConnectionParams.setSoTimeout(httpParams, TIMEOUT_MILLISEC);
+					HttpClient client = new DefaultHttpClient(httpParams);
+					
+					HttpPost request = new HttpPost(serverUrl);
+					try {
+						request.setEntity(new ByteArrayEntity(
+						    location.toString().getBytes("UTF8")));
+							client.execute(request);
+					} catch (Exception e) { // I know, it's late
+						Log.e(LocationService.class.getName(), "Unable to post to service", e);
+					}
+				}
 	
 	            public void onStatusChanged(String provider, int status, Bundle extras) {}
 	
