@@ -26,6 +26,10 @@ import com.sector67.space.helper.DatabaseHelper;
 import com.sector67.space.model.SensorActivity;
 
 public class LocationService extends Service{
+	public static final String LOCATION_UPDATE = "com.sector67.space.service.LocationService.action.LOCATION_UPATE";
+	public static final String LONGITUDE = "com.sector67.space.service.LocationService.action.LONGITUDE";
+	public static final String LATTITUDE = "com.sector67.space.service.LocationService.action.LATTITUDE";
+	public static final String ALTITUDE = "com.sector67.space.service.LocationService.action.ALTITUDE";
     private Handler mHandler = new Handler(Looper.getMainLooper());
     private final DatabaseHelper dbHelper = new DatabaseHelper(this);
 
@@ -57,6 +61,7 @@ public class LocationService extends Service{
 	        			dataMap.put("altitude", Double.toString(location.getAltitude()));
 	        			dataMap.put("accuracy", Double.toString(location.getAccuracy()));
 	        			JSONObject dataObj = new JSONObject(dataMap);
+	        			announceLocationChanges(location.getLatitude(), location.getLongitude(), location.getAltitude());
 	        			dbHelper.getSensorDao().create(new SensorActivity("Location", new Date(), dataObj.toString()));
 	        		} catch (SQLException e) {
 	        			Log.e(LocationService.class.getName(), "Unable to write to database", e);
@@ -108,5 +113,13 @@ public class LocationService extends Service{
     
     public void onDestroy() {
     	
+    }
+    
+    private void announceLocationChanges(double lattitude, double longitude, double altitude) {
+        Intent intent = new Intent(LOCATION_UPDATE);
+        intent.putExtra(LONGITUDE, lattitude);
+        intent.putExtra(LATTITUDE, longitude);
+        intent.putExtra(ALTITUDE, altitude);
+        sendBroadcast(intent);
     }
 }

@@ -1,5 +1,8 @@
 package com.sector67.space;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -10,11 +13,12 @@ import android.os.SystemClock;
 import android.view.Window;
 
 import com.sector67.space.service.CamcorderReciever;
+import com.sector67.space.service.CamcorderService;
 
 
 public class LaunchActivity extends Activity {
     private PendingIntent mCamcorderSender;
-
+    private static final long TIME_TO_RECORD = 300000;
 
 	public LaunchActivity() {
 
@@ -27,16 +31,20 @@ public class LaunchActivity extends Activity {
         
         Intent camcorderIntent = new Intent(getBaseContext(), CamcorderReciever.class);
 
-        // Create IntentSenders that will launch our service, to be scheduled with the alarm manager.
-		mCamcorderSender = PendingIntent.getBroadcast(getBaseContext(), 0, camcorderIntent, 0);
-        
 		MediaPlayer mPlayer = MediaPlayer.create(this, R.raw.launch_countdown);
 		mPlayer.start();
 		
 		//Wait for the right moment
-        long firstTime = SystemClock.elapsedRealtime() + 31000;
-		AlarmManager am = (AlarmManager)getSystemService(ALARM_SERVICE);
-		am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, 500*1000, mCamcorderSender);
+		startService(camcorderIntent);
+		
+        Timer timer = new Timer();
+        timer.schedule( new TimerTask(){
+           public void run() { 
+               Intent spaceIntent = new Intent(getBaseContext(), SpaceActivity.class);
+        	   startActivity(spaceIntent);
+        	   finish();
+            }
+         }, TIME_TO_RECORD);
 
     }
 

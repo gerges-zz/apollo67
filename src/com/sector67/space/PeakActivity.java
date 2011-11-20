@@ -18,15 +18,15 @@ import com.sector67.space.service.LocationService;
 import com.sector67.space.service.SensorService;
 
 
-public class SpaceActivity extends Activity {
+public class PeakActivity extends Activity {
 	private PendingIntent mSensorAlarmSender;
     private PendingIntent mLocationAlarmSender;
     private PendingIntent mCameraSender;
     private PendingIntent mCamcorderSender;
     private BroadcastReceiver locationReciever;
-    private double ALTITUDE_CAP = 50000;
+    private double ALTITUDE_MIN = 50000;
 
-	public SpaceActivity() {
+	public PeakActivity() {
 
 	}
 	
@@ -40,10 +40,10 @@ public class SpaceActivity extends Activity {
 
         
         // Create IntentSenders that will launch our service, to be scheduled with the alarm manager.
-		mSensorAlarmSender = PendingIntent.getService(SpaceActivity.this,
-                0, new Intent(SpaceActivity.this, SensorService.class), 0);
-		mLocationAlarmSender = PendingIntent.getService(SpaceActivity.this,
-                0, new Intent(SpaceActivity.this, LocationService.class), 0);
+		mSensorAlarmSender = PendingIntent.getService(PeakActivity.this,
+                0, new Intent(PeakActivity.this, SensorService.class), 0);
+		mLocationAlarmSender = PendingIntent.getService(PeakActivity.this,
+                0, new Intent(PeakActivity.this, LocationService.class), 0);
 		mCameraSender = PendingIntent.getBroadcast(getBaseContext(), 0, cameraIntent, 0);
 		mCamcorderSender = PendingIntent.getBroadcast(getBaseContext(), 0, camcorderIntent, 0);
         
@@ -69,8 +69,8 @@ public class SpaceActivity extends Activity {
 	                double lattitude = intent.getDoubleExtra(LocationService.LATTITUDE, 0);
 	                double longitude = intent.getDoubleExtra(LocationService.LONGITUDE, 0);
 	                double altitude = intent.getDoubleExtra(LocationService.ALTITUDE, 0);
-	                if(altitude > ALTITUDE_CAP) {
-	                	Intent nextIntent = new Intent(SpaceActivity.this, PeakActivity.class);
+	                if(altitude < ALTITUDE_MIN) {
+	                	Intent nextIntent = new Intent(PeakActivity.this, RecoveryActivity.class);
 	                	startActivity(nextIntent);
 	                	finish();
 	                }
