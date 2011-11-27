@@ -1,7 +1,11 @@
 package com.sector67.space;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
+
 import java.util.Timer;
-import java.util.TimerTask;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 import android.app.Activity;
 import android.app.AlarmManager;
@@ -24,8 +28,10 @@ import com.sector67.space.service.LocationService;
 public class RecoveryActivity extends Activity {
     private PendingIntent mCamcorderSender;
     private BroadcastReceiver locationReciever;
-    private static int ALARM_TIME = 120*1000;
-    private Timer alarmRepeat;
+    private static int ALARM_TIME = 120;
+    private Timer camAlarm;
+    private Timer ringAlarm;
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
 
 
@@ -45,25 +51,29 @@ public class RecoveryActivity extends Activity {
 
         // Create IntentSenders that will launch our service, to be scheduled with the alarm manager.
 		mCamcorderSender = PendingIntent.getBroadcast(getBaseContext(), 0, camcorderIntent, 0);
-		alarmRepeat = new Timer();
-
+		
+		camAlarm = new Timer();
+		ringAlarm = new Timer();
+		
 		//Wait for the right moment
         long firstTime = SystemClock.elapsedRealtime();
 		AlarmManager am = (AlarmManager)getSystemService(ALARM_SERVICE);
 		am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, 300*1000, mCamcorderSender);
-        alarmRepeat.schedule(new TimerTask(){
-            public void run() { 
-        			AlarmManager am = (AlarmManager)getSystemService(ALARM_SERVICE);
+		scheduler.schedule(new Callable<AlarmManager>(){
+            public AlarmManager call() { 
+        			final AlarmManager am = (AlarmManager)getSystemService(ALARM_SERVICE);
         			am.cancel(mCamcorderSender);
+					return am;
             }
-          }, 0, 300*1000);
+          }, 300, SECONDS);
         
-		alarmRepeat.scheduleAtFixedRate(new TimerTask(){
+		scheduler.scheduleAtFixedRate(new Runnable(){
 	        public void run() { 
+	        	Log.d(RecoveryActivity.class.getName(), "Ding Dong");
 	       		MediaPlayer mPlayer = MediaPlayer.create(RecoveryActivity.this, R.raw.loudbeep);
 	    		mPlayer.start();
 	           }
-	         }, 330*1000, ALARM_TIME);
+	         }, 0, ALARM_TIME, SECONDS);
 			
 		//Register for location updates
         IntentFilter locationFilter;
@@ -96,15 +106,21 @@ public class RecoveryActivity extends Activity {
 		super.onDestroy();
 		AlarmManager am = (AlarmManager)getSystemService(ALARM_SERVICE);
 		am.cancel(mCamcorderSender);
-		if(null != alarmRepeat) {			
-			alarmRepeat.cancel();		
+		if(null != camAlarm) {			
+			camAlarm.cancel();		
+		}
+		if(null != ringAlarm) {
+			ringAlarm.cancel();
 		}
 	}
 	
 	public void onPause() {
 		super.onPause();
-		if(null != alarmRepeat) {			
-			alarmRepeat.cancel();		
+		if(null != camAlarm) {			
+			camAlarm.cancel();		
+		}
+		if(null != ringAlarm) {
+			ringAlarm.cancel();
 		}
 	}
 }
