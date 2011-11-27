@@ -57,7 +57,7 @@ public class LaunchActivity extends Activity {
                nextActivity();
             }
 
-         }, 300*1000);
+         }, 331*1000);
 
     }
 
