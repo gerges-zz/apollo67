@@ -46,6 +46,8 @@ public class PeakActivity extends Activity  implements TextToSpeech.OnInitListen
         
         Log.d(LaunchActivity.class.getName(), "Entering Peak Activity");
         
+        mTts = new TextToSpeech(this, this);
+        
         Intent cameraIntent = new Intent(getBaseContext(), CameraReciever.class);
         Intent camcorderIntent = new Intent(getBaseContext(), CamcorderReciever.class);
         camcorderIntent.putExtra("timeToRecord", 300*1000);

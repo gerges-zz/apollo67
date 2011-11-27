@@ -44,6 +44,8 @@ public class FallingActivity extends Activity implements TextToSpeech.OnInitList
         
         Log.d(LaunchActivity.class.getName(), "Entering Falling Activity");
         
+        mTts = new TextToSpeech(this, this);
+        
         Intent cameraIntent = new Intent(getBaseContext(), CameraReciever.class);
         Intent camcorderIntent = new Intent(getBaseContext(), CamcorderReciever.class);
         camcorderIntent.putExtra("timeToRecord", 30*1000);

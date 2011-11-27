@@ -50,6 +50,8 @@ public class RecoveryActivity extends Activity implements TextToSpeech.OnInitLis
         
         Log.d(LaunchActivity.class.getName(), "Entering Recovery Activity");
         
+        mTts = new TextToSpeech(this, this);
+        
         Intent camcorderIntent = new Intent(getBaseContext(), CamcorderReciever.class);
         camcorderIntent.putExtra("timeToRecord", 300*1000);
 

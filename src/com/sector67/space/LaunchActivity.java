@@ -43,6 +43,8 @@ public class LaunchActivity extends Activity  implements TextToSpeech.OnInitList
         
         Log.d(LaunchActivity.class.getName(), "Entering Launch Activity");
         
+        mTts = new TextToSpeech(this, this);
+        
         Intent camcorderIntent = new Intent(getBaseContext(), CamcorderReciever.class);
         camcorderIntent.putExtra("timeToRecord", 300*1000);
 		mCamcorderSender = PendingIntent.getBroadcast(getBaseContext(), 0, camcorderIntent, 0);
