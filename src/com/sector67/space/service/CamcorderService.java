@@ -44,7 +44,7 @@ public class CamcorderService extends Activity implements SurfaceHolder.Callback
     public void onCreate(Bundle bundle) {
     	try {
 		super.onCreate(bundle);
-			Log.d(CamcorderService.class.getName(), "Activity created");
+			Log.d(CamcorderService.class.getName(), "Camcorder activity created, taking video");
 	
 			timeToRecord = getIntent().getIntExtra("timeToRecord", 120*1000);
 			

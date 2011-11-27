@@ -9,7 +9,9 @@ import android.app.PendingIntent;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.PowerManager;
 import android.os.SystemClock;
+import android.util.Log;
 import android.view.Window;
 
 import com.sector67.space.service.CamcorderReciever;
@@ -20,9 +22,7 @@ import com.sector67.space.service.LocationService;
 public class LaunchActivity extends Activity {
     private PendingIntent mLocationAlarmSender;
     private PendingIntent mCamcorderSender;
-    private boolean hasEnded = false;
-
-
+    private static PowerManager.WakeLock wakeLock;
 
 	public LaunchActivity() {
 
@@ -32,6 +32,8 @@ public class LaunchActivity extends Activity {
     	super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.launch);
+        
+        Log.d(LaunchActivity.class.getName(), "Entering Launch Activity");
         
         Intent camcorderIntent = new Intent(getBaseContext(), CamcorderReciever.class);
         camcorderIntent.putExtra("timeToRecord", 300*1000);
@@ -52,14 +54,9 @@ public class LaunchActivity extends Activity {
         Timer timer = new Timer();
         timer.schedule( new TimerTask(){
            public void run() { 
-	           	if(!hasEnded) {
-	               Intent spaceIntent = new Intent(getBaseContext(), SpaceActivity.class);
-	               stopCameraAndCamcorder();
-	        	   startActivity(spaceIntent);
-	        	   finish();
-	        	   hasEnded = true;
-	           	}
+               nextActivity();
             }
+
          }, 300*1000);
 
     }
@@ -71,7 +68,6 @@ public class LaunchActivity extends Activity {
 	public void onDestroy() {
 		super.onDestroy();
 		AlarmManager am = (AlarmManager)getSystemService(ALARM_SERVICE);
-		am.cancel(mLocationAlarmSender);
 		am.cancel(mCamcorderSender);
 	}
 	
@@ -84,5 +80,20 @@ public class LaunchActivity extends Activity {
 		Intent stopCameraReciever = new Intent(LaunchActivity.this, CameraReciever.class);
 		stopCameraReciever.putExtra("action", "stop");
 		sendBroadcast(stopCameraReciever);
+	}
+
+	private void nextActivity() {
+		//aquire wakelock
+       PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
+       wakeLock = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK| PowerManager.ON_AFTER_RELEASE, LaunchActivity.class.getName());
+       wakeLock.acquire();
+       
+	   Intent spaceIntent = new Intent(getBaseContext(), SpaceActivity.class);
+       stopCameraAndCamcorder();
+	   startActivity(spaceIntent);
+	   finish();
+	   
+   		//release wakelock
+       if (wakeLock != null) wakeLock.release();
 	}
 }

@@ -43,9 +43,8 @@ public class LocationService extends Service{
 	public static final String ALTITUDE = "com.sector67.space.service.LocationService.action.ALTITUDE";
 	public static final String SERVER_URL = "http://apollo67.com/service.php";
 
-	
-    private Handler mHandler = new Handler(Looper.getMainLooper());
-    private final DatabaseHelper dbHelper = new DatabaseHelper(this);
+	private Handler mHandler = new Handler(Looper.getMainLooper());
+	private final DatabaseHelper dbHelper = new DatabaseHelper(this);
 
     
     private final IBinder mBinder = new Binder() {
@@ -58,16 +57,11 @@ public class LocationService extends Service{
     
     Runnable mTask = new Runnable() {
         public void run() {
-            long endTime = System.currentTimeMillis() + 15*1000;
-
-	 	   // Acquire a reference to the system Location Manager
 	        final LocationManager locationManager = (LocationManager) LocationService.this.getSystemService(Context.LOCATION_SERVICE);
 	        
-	        // Define a listener that responds to location updates
 	        final LocationListener locationListener = new LocationListener() {
 	            public void onLocationChanged(Location location) {
 	            	// Called when a new location is found by the network location provider.
-	            	//log.debug("Location found! " + location);
 	        		try {
 	        			JSONObject dataObj = convertLocationToJSON(location);
 	        			announceLocationChanges(location.getLatitude(), location.getLongitude(), location.getAltitude());
@@ -116,24 +110,11 @@ public class LocationService extends Service{
 	          };
 	
 	        // Register the listener with the Location Manager to receive location updates
-	       mHandler.post(new Runnable() {
-	              public void run() {
-	            	  locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
-	              }
-	        });
-           
-	       //"Give it a second, it's going to space"
-           while (System.currentTimeMillis() < endTime) {
-               synchronized (mBinder) {
-                   try {
-                       mBinder.wait(endTime - System.currentTimeMillis());
-                   } catch (Exception e) {
-                   }
-               }
-           }
-           
-	       // Done with our work...  stop the service!
-	       LocationService.this.stopSelf();
+			mHandler.post(new Runnable() {
+				public void run() {
+					locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+				}
+			});
         }
     };
     
@@ -146,7 +127,27 @@ public class LocationService extends Service{
     public void onCreate() {
     	super.onCreate();
         Thread thr = new Thread(null, mTask, "LocationService");
+        long endTime = System.currentTimeMillis() + 15*1000;
         thr.start();
+        //"Give it a second, it's going to space"
+        while (System.currentTimeMillis() < endTime) {
+            synchronized (mBinder) {
+                try {
+                    mBinder.wait(endTime - System.currentTimeMillis());
+                } catch (Exception e) {
+                }
+            }
+        }
+
+        //If the thread hasns't discovered anything by now, interupt.
+        if(null != thr) {
+	        Thread moribund = thr;
+	        thr = null;
+	        moribund.interrupt();
+        }
+        
+        // Done with our work...  stop the service!
+        LocationService.this.stopSelf();
     }
     
     

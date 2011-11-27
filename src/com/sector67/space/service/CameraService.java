@@ -72,7 +72,7 @@ public class CameraService extends Activity implements SurfaceHolder.Callback {
 
     public void onCreate(Bundle icircle) {
 		super.onCreate(icircle);
-		Log.d(CameraService.class.getName(), "Activity created");
+		Log.d(CameraService.class.getName(), "Camera activity created, taking photo");
 
         // Configure window
         getWindow().setFormat(PixelFormat.TRANSLUCENT);
