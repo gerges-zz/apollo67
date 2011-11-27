@@ -1,16 +1,21 @@
 package com.sector67.space;
 
+import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.os.SystemClock;
+import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.Window;
 
@@ -19,10 +24,13 @@ import com.sector67.space.service.CameraReciever;
 import com.sector67.space.service.LocationService;
 
 
-public class LaunchActivity extends Activity {
+public class LaunchActivity extends Activity  implements TextToSpeech.OnInitListener {
     private PendingIntent mLocationAlarmSender;
     private PendingIntent mCamcorderSender;
     private static PowerManager.WakeLock wakeLock;
+    private BroadcastReceiver locationReciever;
+    private TextToSpeech mTts;
+    private boolean speechReady;
 
 	public LaunchActivity() {
 
@@ -58,6 +66,12 @@ public class LaunchActivity extends Activity {
             }
 
          }, 331*1000);
+        
+		//Register for location updates
+        IntentFilter locationFilter;
+        locationFilter = new IntentFilter(LocationService.LOCATION_UPDATE);
+        locationReciever = new LocationServiceReciever();
+        registerReceiver(locationReciever, locationFilter);
 
     }
 
@@ -95,5 +109,33 @@ public class LaunchActivity extends Activity {
 	   
    		//release wakelock
        if (wakeLock != null) wakeLock.release();
+	}
+	
+	 public class LocationServiceReciever extends BroadcastReceiver {
+	      @Override
+	        public void onReceive(Context context, Intent intent) {
+	                double altitude = intent.getDoubleExtra(LocationService.ALTITUDE, 0);
+	                double longitude = intent.getDoubleExtra(LocationService.LONGITUDE, 0);
+	                double lattitude = intent.getDoubleExtra(LocationService.LATTITUDE, 0);
+	                String message = "loc, longitude " + Double.toString(longitude) + ", lattitude " + Double.toString(lattitude) + ", altitude " + Double.toString(altitude);
+	                if(null != mTts && speechReady) {
+	                	mTts.speak(message, TextToSpeech.QUEUE_FLUSH, null);
+	                }
+	        }
+	    }
+	 
+	@Override
+	public void onInit(int status) {
+        if (status == TextToSpeech.SUCCESS) {
+            int result = mTts.setLanguage(Locale.US);
+            if (result == TextToSpeech.LANG_MISSING_DATA ||
+                result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                Log.e(SpaceActivity.class.getName(), "Language is not available.");
+            }
+            speechReady = true;
+        } else {
+            // Initialization failed.
+            Log.e(SpaceActivity.class.getName(), "Could not initialize TextToSpeech.");
+        }
 	}
 }

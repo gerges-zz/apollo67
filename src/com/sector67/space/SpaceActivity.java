@@ -1,5 +1,7 @@
 package com.sector67.space;
 
+import java.util.Locale;
+
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -10,6 +12,7 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.os.SystemClock;
+import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.Window;
 
@@ -19,7 +22,7 @@ import com.sector67.space.service.LocationService;
 import com.sector67.space.service.SensorService;
 
 
-public class SpaceActivity extends Activity {
+public class SpaceActivity extends Activity implements TextToSpeech.OnInitListener {
 	private PendingIntent mSensorAlarmSender;
     private PendingIntent mCameraSender;
     private PendingIntent mCamcorderSender;
@@ -27,7 +30,9 @@ public class SpaceActivity extends Activity {
     private static PowerManager.WakeLock wakeLock;
     private boolean hasEnded = false;
     private double ALTITUDE_CAP = 15240;
-
+    private TextToSpeech mTts;
+    private boolean speechReady;
+    
 	public SpaceActivity() {
 
 	}
@@ -38,6 +43,8 @@ public class SpaceActivity extends Activity {
         setContentView(R.layout.space);
         
         Log.d(LaunchActivity.class.getName(), "Entering Space Activity");
+        
+        mTts = new TextToSpeech(this, this);
         
         Intent cameraIntent = new Intent(getBaseContext(), CameraReciever.class);
         Intent camcorderIntent = new Intent(getBaseContext(), CamcorderReciever.class);
@@ -68,6 +75,13 @@ public class SpaceActivity extends Activity {
 	      @Override
 	        public void onReceive(Context context, Intent intent) {
 	                double altitude = intent.getDoubleExtra(LocationService.ALTITUDE, 0);
+	                double longitude = intent.getDoubleExtra(LocationService.LONGITUDE, 0);
+	                double lattitude = intent.getDoubleExtra(LocationService.LATTITUDE, 0);
+	                String message = "loc, longitude " + Double.toString(longitude) + ", lattitude " + Double.toString(lattitude) + ", altitude " + Double.toString(altitude);
+	                if(null != mTts && speechReady) {
+	                	mTts.speak(message, TextToSpeech.QUEUE_FLUSH, null);
+	                }
+	                
 	                if(altitude > ALTITUDE_CAP) {
 	                	if(!hasEnded) {
 	                		nextActivity();
@@ -115,6 +129,21 @@ public class SpaceActivity extends Activity {
     	   
        		//release wakelock
            if (wakeLock != null) wakeLock.release();
+	}
+
+	@Override
+	public void onInit(int status) {
+        if (status == TextToSpeech.SUCCESS) {
+            int result = mTts.setLanguage(Locale.US);
+            if (result == TextToSpeech.LANG_MISSING_DATA ||
+                result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                Log.e(SpaceActivity.class.getName(), "Language is not available.");
+            }
+            speechReady = true;
+        } else {
+            // Initialization failed.
+            Log.e(SpaceActivity.class.getName(), "Could not initialize TextToSpeech.");
+        }
 	}
 	
 }

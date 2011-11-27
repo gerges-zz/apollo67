@@ -1,5 +1,6 @@
 package com.sector67.space;
 
+import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -13,6 +14,7 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.os.SystemClock;
+import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.Window;
 
@@ -22,7 +24,7 @@ import com.sector67.space.service.LocationService;
 import com.sector67.space.service.SensorService;
 
 
-public class PeakActivity extends Activity {
+public class PeakActivity extends Activity  implements TextToSpeech.OnInitListener {
 	private PendingIntent mSensorAlarmSender;
     private PendingIntent mCameraSender;
     private PendingIntent mCamcorderSender;
@@ -30,6 +32,8 @@ public class PeakActivity extends Activity {
     private boolean hasEnded = false;
     private static PowerManager.WakeLock wakeLock;
     private double ALTITUDE_MIN = 12192;
+    private TextToSpeech mTts;
+    private boolean speechReady;
 
 	public PeakActivity() {
 
@@ -81,13 +85,19 @@ public class PeakActivity extends Activity {
 	      @Override
 	        public void onReceive(Context context, Intent intent)//this method receives broadcast messages. Be sure to modify AndroidManifest.xml file in order to enable message receiving
 	        {
-	                double altitude = intent.getDoubleExtra(LocationService.ALTITUDE, 0);
-	                if(altitude < ALTITUDE_MIN) {
-	                	if(!hasEnded) {
-	                		nextActivity();
-		                	hasEnded = true;
-	                	}
-	                }
+		          double altitude = intent.getDoubleExtra(LocationService.ALTITUDE, 0);
+		          double longitude = intent.getDoubleExtra(LocationService.LONGITUDE, 0);
+		          double lattitude = intent.getDoubleExtra(LocationService.LATTITUDE, 0);
+		          String message = "loc, longitude " + Double.toString(longitude) + ", lattitude " + Double.toString(lattitude) + ", altitude " + Double.toString(altitude);
+		          if(null != mTts && speechReady) {
+		          	mTts.speak(message, TextToSpeech.QUEUE_FLUSH, null);
+		          }
+                if(altitude < ALTITUDE_MIN) {
+                	if(!hasEnded) {
+                		nextActivity();
+	                	hasEnded = true;
+                	}
+                }
 	                
 	        }
 	    }
@@ -130,4 +140,18 @@ public class PeakActivity extends Activity {
        if (wakeLock != null) wakeLock.release();
 	}
 	
+	@Override
+	public void onInit(int status) {
+        if (status == TextToSpeech.SUCCESS) {
+            int result = mTts.setLanguage(Locale.US);
+            if (result == TextToSpeech.LANG_MISSING_DATA ||
+                result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                Log.e(SpaceActivity.class.getName(), "Language is not available.");
+            }
+            speechReady = true;
+        } else {
+            // Initialization failed.
+            Log.e(SpaceActivity.class.getName(), "Could not initialize TextToSpeech.");
+        }
+	}
 }

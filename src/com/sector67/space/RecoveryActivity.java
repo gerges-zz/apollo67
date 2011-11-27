@@ -2,6 +2,7 @@ package com.sector67.space;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
+import java.util.Locale;
 import java.util.Timer;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
@@ -17,6 +18,7 @@ import android.content.IntentFilter;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.speech.tts.TextToSpeech;
 import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.Window;
@@ -25,13 +27,15 @@ import com.sector67.space.service.CamcorderReciever;
 import com.sector67.space.service.LocationService;
 
 
-public class RecoveryActivity extends Activity {
+public class RecoveryActivity extends Activity implements TextToSpeech.OnInitListener {
     private PendingIntent mCamcorderSender;
     private BroadcastReceiver locationReciever;
     private static int ALARM_TIME = 120;
     private Timer camAlarm;
     private Timer ringAlarm;
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+    private TextToSpeech mTts;
+    private boolean speechReady;
 
 
 
@@ -87,14 +91,18 @@ public class RecoveryActivity extends Activity {
 	      @Override
 	        public void onReceive(Context context, Intent intent)//this method receives broadcast messages. Be sure to modify AndroidManifest.xml file in order to enable message receiving
 	        {
-                double lattitude = intent.getDoubleExtra(LocationService.LATTITUDE, 0);
-                double longitude = intent.getDoubleExtra(LocationService.LONGITUDE, 0);
-                double altitude = intent.getDoubleExtra(LocationService.ALTITUDE, 0);
+	          double altitude = intent.getDoubleExtra(LocationService.ALTITUDE, 0);
+	          double longitude = intent.getDoubleExtra(LocationService.LONGITUDE, 0);
+	          double lattitude = intent.getDoubleExtra(LocationService.LATTITUDE, 0);
+	          String message = "loc, longitude " + Double.toString(longitude) + ", lattitude " + Double.toString(lattitude) + ", altitude " + Double.toString(altitude);
+	          if(null != mTts && speechReady) {
+	          	mTts.speak(message, TextToSpeech.QUEUE_FLUSH, null);
+	          }
                
                 //Prepare for recovery, send some texts
                 SmsManager sms = SmsManager.getDefault();
-                String message = lattitude + ", " + longitude + " at " + altitude + " meters";
-                sms.sendTextMessage("9206981905", null, message, null, null);
+                String smsMessage = lattitude + ", " + longitude + " at " + altitude + " meters";
+                sms.sendTextMessage("9206981905", null, smsMessage, null, null);
 	        }
 	    }
 	 
@@ -122,6 +130,21 @@ public class RecoveryActivity extends Activity {
 		if(null != ringAlarm) {
 			ringAlarm.cancel();
 		}
+	}
+	
+	@Override
+	public void onInit(int status) {
+        if (status == TextToSpeech.SUCCESS) {
+            int result = mTts.setLanguage(Locale.US);
+            if (result == TextToSpeech.LANG_MISSING_DATA ||
+                result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                Log.e(SpaceActivity.class.getName(), "Language is not available.");
+            }
+            speechReady = true;
+        } else {
+            // Initialization failed.
+            Log.e(SpaceActivity.class.getName(), "Could not initialize TextToSpeech.");
+        }
 	}
 }
 ;
