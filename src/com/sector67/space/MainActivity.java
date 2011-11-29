@@ -1,9 +1,9 @@
 package com.sector67.space;
 
-import android.app.Activity;
+import roboguice.activity.RoboActivity;
+import roboguice.inject.InjectView;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -11,47 +11,38 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
-public class MainActivity extends Activity {
-	private SharedPreferences sharedPreferences;
-	private EditText triggerText; 
-	private Button savePrefs;
-	private TextView currentTrigger;
-	private ToggleButton primerButton;
-	private Button.OnClickListener saveOnClickListener = new Button.OnClickListener(){
-		  @Override
-		  public void onClick(View arg0) {
+import com.google.inject.Inject;
+
+public class MainActivity extends RoboActivity {
+	private @Inject SharedPreferences sharedPreferences;
+	private @InjectView(R.id.triggerText) EditText triggerText; 
+	private @InjectView(R.id.savePrefs) Button savePrefs;
+	private @InjectView(R.id.currentTrigger) TextView currentTrigger;
+	private @InjectView(R.id.primerButton) ToggleButton primerButton;
+	
+    /** Called when the activity is first created. */
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+    	super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        setContentView(R.layout.main);
+        
+        updateDisplay("trigger", "Apollo67 Launch", currentTrigger);
+        
+        savePrefs.setOnClickListener(new Button.OnClickListener(){
+        	public void onClick(View view) {
 			  String newTriggerText = triggerText.getText().toString().trim();
 			  if(!newTriggerText.equals("")) {
 				  savePref("trigger", newTriggerText);
 			  }
 			  updateDisplay("trigger", "Apollo67 Launch", currentTrigger);
 		  }
-     };
- 	private ToggleButton.OnClickListener primerClickListener = new ToggleButton.OnClickListener(){
-		  @Override
-		  public void onClick(View arg0) {
-		   savePref("primer", Boolean.toString(primerButton.isChecked()));
-		  }
-   };
-	
-    /** Called when the activity is first created. */
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.main);
-        
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        
-        triggerText = (EditText)findViewById(R.id.triggerText);
-        savePrefs = (Button)findViewById(R.id.savePrefs);
-        currentTrigger = (TextView)findViewById(R.id.currentTrigger);
-        primerButton = (ToggleButton)findViewById(R.id.primerButton);
-
-        savePrefs.setOnClickListener(saveOnClickListener);
-        primerButton.setOnClickListener(primerClickListener);
-        
-        updateDisplay("trigger", "Apollo67 Launch", currentTrigger);
+        });
+        primerButton.setOnClickListener(new ToggleButton.OnClickListener(){
+  		  public void onClick(View view) {
+  			   savePref("primer", Boolean.toString(primerButton.isChecked()));
+  			  }
+  	  	});
 
     }
     
