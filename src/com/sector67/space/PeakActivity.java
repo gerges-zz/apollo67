@@ -4,7 +4,7 @@ import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import android.app.Activity;
+import roboguice.activity.RoboActivity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -18,13 +18,15 @@ import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.Window;
 
+import com.google.inject.Inject;
 import com.sector67.space.service.CamcorderReciever;
 import com.sector67.space.service.CameraReciever;
 import com.sector67.space.service.LocationService;
 import com.sector67.space.service.SensorService;
 
 
-public class PeakActivity extends Activity  implements TextToSpeech.OnInitListener {
+public class PeakActivity extends RoboActivity  implements TextToSpeech.OnInitListener {
+	@Inject AlarmManager alarmManager;
 	private PendingIntent mSensorAlarmSender;
     private PendingIntent mCameraSender;
     private PendingIntent mCamcorderSender;
@@ -61,17 +63,15 @@ public class PeakActivity extends Activity  implements TextToSpeech.OnInitListen
         
 		//we run a tight schedule.
         long firstTime = SystemClock.elapsedRealtime();
-		AlarmManager am = (AlarmManager)getSystemService(ALARM_SERVICE);
-        am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, 300*1000, mSensorAlarmSender);
-        am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, 500*1000, mCamcorderSender);
+        alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, 300*1000, mSensorAlarmSender);
+        alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, 500*1000, mCamcorderSender);
         
         Timer timer = new Timer();
         timer.schedule( new TimerTask(){
            public void run() { 
-       			AlarmManager am = (AlarmManager)getSystemService(ALARM_SERVICE);
        	        long firstTime = SystemClock.elapsedRealtime();
-       	        am.cancel(mCamcorderSender);
-       	        am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, 30*1000, mCameraSender);
+       	        alarmManager.cancel(mCamcorderSender);
+       	        alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, 30*1000, mCameraSender);
             }
          }, 330*1000);
 
@@ -110,10 +110,9 @@ public class PeakActivity extends Activity  implements TextToSpeech.OnInitListen
 	
 	public void onDestroy() {
 		super.onDestroy();
-		AlarmManager am = (AlarmManager)getSystemService(ALARM_SERVICE);
-		am.cancel(mSensorAlarmSender);
-		am.cancel(mCameraSender);
-		am.cancel(mCamcorderSender);
+		alarmManager.cancel(mSensorAlarmSender);
+		alarmManager.cancel(mCameraSender);
+		alarmManager.cancel(mCamcorderSender);
 	}
 	
 	private void stopCameraAndCamcorder() {

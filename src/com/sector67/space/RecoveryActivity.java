@@ -8,7 +8,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
-import android.app.Activity;
+import roboguice.activity.RoboActivity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -23,12 +23,14 @@ import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.Window;
 
+import com.google.inject.Inject;
 import com.sector67.space.service.CamcorderReciever;
 import com.sector67.space.service.LocationService;
 
 
-public class RecoveryActivity extends Activity implements TextToSpeech.OnInitListener {
-    private PendingIntent mCamcorderSender;
+public class RecoveryActivity extends RoboActivity implements TextToSpeech.OnInitListener {
+	@Inject AlarmManager alarmManager;
+	private PendingIntent mCamcorderSender;
     private BroadcastReceiver locationReciever;
     private static int ALARM_TIME = 120;
     private Timer camAlarm;
@@ -63,13 +65,11 @@ public class RecoveryActivity extends Activity implements TextToSpeech.OnInitLis
 		
 		//Wait for the right moment
         long firstTime = SystemClock.elapsedRealtime();
-		AlarmManager am = (AlarmManager)getSystemService(ALARM_SERVICE);
-		am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, 300*1000, mCamcorderSender);
+        alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, 300*1000, mCamcorderSender);
 		scheduler.schedule(new Callable<AlarmManager>(){
             public AlarmManager call() { 
-        			final AlarmManager am = (AlarmManager)getSystemService(ALARM_SERVICE);
-        			am.cancel(mCamcorderSender);
-					return am;
+            		alarmManager.cancel(mCamcorderSender);
+					return alarmManager;
             }
           }, 300, SECONDS);
         
@@ -114,8 +114,7 @@ public class RecoveryActivity extends Activity implements TextToSpeech.OnInitLis
 	
 	public void onDestroy() {
 		super.onDestroy();
-		AlarmManager am = (AlarmManager)getSystemService(ALARM_SERVICE);
-		am.cancel(mCamcorderSender);
+		alarmManager.cancel(mCamcorderSender);
 		if(null != camAlarm) {			
 			camAlarm.cancel();		
 		}
